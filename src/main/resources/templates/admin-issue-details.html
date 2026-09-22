@@ -1,0 +1,292 @@
+```html
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Civentre - Issue Details</title>
+
+    <link rel="stylesheet"
+          href="/admin-issue-details.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+</head>
+
+<body>
+
+<header class="admin-header">
+
+    <div>
+        <h1>Civentre Admin</h1>
+        <p>Issue Details</p>
+    </div>
+
+    <a href="/logout" class="logout-btn">
+        Logout
+    </a>
+
+</header>
+
+
+<main class="details-container">
+
+    <a href="/admin" class="back-link">
+        ← Back to Admin Dashboard
+    </a>
+
+
+    <!-- Issue Overview -->
+
+    <section class="details-card">
+
+        <h2>
+            Issue #
+            <span th:text="${issue.id}"></span>
+        </h2>
+
+        <div class="issue-overview">
+
+            <div class="detail-item">
+                <strong>Title</strong>
+                <span th:text="${issue.title}"></span>
+            </div>
+
+            <div class="detail-item">
+                <strong>Category</strong>
+                <span th:text="${issue.category}"></span>
+            </div>
+
+            <div class="detail-item">
+
+                <strong>Status</strong>
+
+                <span
+                        class="status"
+                        th:classappend="${#strings.toLowerCase(issue.status)}"
+                        th:text="${issue.status}">
+                </span>
+
+            </div>
+
+            <div class="detail-item">
+                <strong>Priority</strong>
+                <span th:text="${issue.priority}"></span>
+            </div>
+
+            <div class="detail-item">
+                <strong>Location</strong>
+                <span th:text="${issue.location}"></span>
+            </div>
+
+            <div class="detail-item">
+                <strong>Reported On</strong>
+                <span th:text="${issue.createdAt}"></span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Description -->
+
+    <section class="details-card">
+
+        <h2>Description</h2>
+
+        <div class="description"
+             th:text="${issue.description}">
+        </div>
+
+    </section>
+
+
+    <!-- Citizen Information -->
+
+    <section class="details-card">
+
+        <h2>Reported By</h2>
+
+        <div class="citizen-info">
+
+            <div class="detail-item">
+
+                <strong>Name</strong>
+
+                <span th:text="${issue.user.name}">
+                </span>
+
+            </div>
+
+            <div class="detail-item">
+
+                <strong>Email</strong>
+
+                <span th:text="${issue.user.email}">
+                </span>
+
+            </div>
+
+            <div class="detail-item">
+
+                <strong>Phone</strong>
+
+                <span th:text="${issue.user.phone}">
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Location Coordinates -->
+
+    <section class="details-card">
+
+        <h2>Location Coordinates</h2>
+
+        <div class="coordinates">
+
+            <div class="detail-item">
+
+                <strong>Latitude</strong>
+
+                <span th:text="${issue.latitude}">
+                </span>
+
+            </div>
+
+            <div class="detail-item">
+
+                <strong>Longitude</strong>
+
+                <span th:text="${issue.longitude}">
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Interactive Map -->
+
+    <section class="details-card">
+
+        <h2>Issue Location</h2>
+
+        <div id="issueMap"></div>
+
+    </section>
+
+
+    <!-- Image -->
+
+    <section class="details-card"
+             th:if="${issue.imagePath != null}">
+
+        <h2>Issue Image</h2>
+
+        <img
+                class="issue-image"
+                th:src="@{'/uploads/' + ${issue.imagePath}}"
+                alt="Reported Issue Image">
+
+    </section>
+
+
+    <!-- Status History -->
+
+    <section class="details-card">
+
+        <h2>Status History</h2>
+
+        <div th:if="${history.isEmpty()}"
+             class="no-history">
+
+            No status history available.
+
+        </div>
+
+        <div th:each="update : ${history}"
+             class="history-item">
+
+            <div
+                    class="history-status"
+                    th:text="${update.status}">
+            </div>
+
+            <div
+                    class="history-remarks"
+                    th:text="${update.remarks}">
+            </div>
+
+            <div
+                    class="history-date"
+                    th:text="${update.updatedAt}">
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- Leaflet JavaScript -->
+
+<script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+<script th:inline="javascript">
+
+    const latitude = [[${issue.latitude}]];
+    const longitude = [[${issue.longitude}]];
+    const issueId = [[${issue.id}]];
+
+    const map = L.map("issueMap").setView(
+        [latitude, longitude],
+        16
+    );
+
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap contributors"
+        }
+    ).addTo(map);
+
+
+    const marker = L.marker(
+        [latitude, longitude]
+    ).addTo(map);
+
+
+    marker.bindPopup(
+        "<strong>Reported Issue</strong><br>" +
+        "Issue #" + issueId
+    ).openPopup();
+
+</script>
+
+
+</body>
+
+</html>
+```

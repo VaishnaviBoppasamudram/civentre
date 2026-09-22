@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Civentre - Report Issue</title>
+
+    <link rel="stylesheet" href="/report-issue.css">
+    <meta name="_csrf" content="" />
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        Civentre
+    </div>
+
+    <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/report-issue">Report Issue</a>
+        <a href="/my-issues">My Issues</a>
+        <a href="/notifications">Notifications</a>
+    </nav>
+
+    <div class="profile">
+        <span>Citizen</span>
+        <a href="/logout">Logout</a>
+    </div>
+
+</header>
+
+
+<main class="report-container">
+
+    <section class="report-card">
+
+        <h1>Report a Public Issue</h1>
+
+        <p class="intro">
+            Help improve your community by reporting a public issue.
+        </p>
+
+
+        <form id="issueForm">
+            <div class="form-group">
+                <label for="title">Issue Title</label>
+
+                <input
+                        type="text"
+                        id="title"
+                        placeholder="Example: Broken streetlight"
+                        required>
+            </div>
+
+
+            <div class="form-group">
+                <label for="description">Description</label>
+
+                <textarea
+                        id="description"
+                        placeholder="Describe the issue in detail"
+                        required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" required>
+                    <option value="">Select a category</option>
+                    <option value="Pothole">Pothole</option>
+                    <option value="Garbage">Garbage</option>
+                    <option value="Streetlight">Broken Streetlight</option>
+                    <option value="Water Leakage">Water Leakage</option>
+                    <option value="Traffic Signal">Damaged Traffic Signal</option>
+                    <option value="Road Damage">Road Damage</option>
+                    <option value="Fallen Tree">Fallen Tree</option>
+                    <option value="Traffic">Traffic</option>
+                    <option value="Other">Other</option>
+
+                </select>
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="location">Location</label>
+
+                <input
+                        type="text"
+                        id="location"
+                        name="location"
+                        placeholder="Enter the issue location"
+                        required>
+
+                <button type="button" id="locationButton">
+                    📍 Use My Current Location
+                </button>
+
+                <p id="locationMessage"></p>
+
+            </div>
+
+            <input type="hidden" id="latitude">
+            <input type="hidden" id="longitude">
+
+
+            <div class="form-group">
+
+                <label>Issue Evidence</label>
+
+                <button type="button" id="cameraButton">
+                    📷 Take Photo
+                </button>
+
+                <input
+                        type="file"
+                        id="image"
+                        accept="image/*">
+
+                <video id="cameraPreview" autoplay playsinline></video>
+
+                <canvas id="photoCanvas"></canvas>
+
+                <button type="button" id="captureButton" style="display: none;">📸 Capture Photo</button>
+                <button type="button" id="retakeButton" style="display: none;">🔄 Retake</button>
+
+                <img id="photoPreview" alt="Captured Issue Photo">
+
+                <p id="cameraMessage"></p>
+
+            </div>
+
+            <div id="duplicateSection" class="duplicate-section" style="display: none;">
+                <h3>⚠️ Possible Existing Issues</h3>
+
+                <p>
+                    Similar issues have already been reported near this location.
+                    Please review them before submitting a new report.
+                </p>
+
+                <div id="duplicateList"></div>
+            </div>
+
+
+            <button type="submit">
+                Submit Issue
+            </button>
+
+        </form>
+
+
+        <p id="message"></p>
+
+    </section>
+
+</main>
+
+
+<script>
+
+    function getCsrfToken() {
+        const cookie = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("XSRF-TOKEN="));
+
+        return cookie ? decodeURIComponent(cookie.split("=")[1]) : null;
+    }
+
+    console.log("REPORT ISSUE SCRIPT LOADED");
+
+
+    document.getElementById("locationButton").addEventListener("click", function () {
+
+        const locationMessage =
+            document.getElementById("locationMessage");
+
+        if (!navigator.geolocation) {
+
+            locationMessage.textContent =
+                "Location is not supported by this browser.";
+
+            return;
+        }
+
+        locationMessage.textContent =
+            "Getting your location...";
+
+
+        navigator.geolocation.getCurrentPosition(
+
+            function (position) {
+
+                const latitude =
+                    position.coords.latitude;
+
+                const longitude =
+                    position.coords.longitude;
+
+
+                document.getElementById("latitude").value =
+                    latitude;
+
+                document.getElementById("longitude").value =
+                    longitude;
+
+
+                document.getElementById("location").value =
+                    latitude + ", " + longitude;
+
+
+                locationMessage.textContent =
+                    "Location captured successfully.";
+            },
+
+
+            function () {
+
+                locationMessage.textContent =
+                    "Unable to get your location. Please enter it manually.";
+            }
+        );
+
+    });
+
+
+
+
+    let cameraStream = null;
+    let capturedImage = null;
+
+    document.getElementById("cameraButton").addEventListener("click", async function () {
+
+        const video = document.getElementById("cameraPreview");
+        const cameraMessage = document.getElementById("cameraMessage");
+
+        try {
+
+            cameraStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: "environment"
+                },
+                audio: false
+            });
+
+            video.srcObject = cameraStream;
+            video.style.display = "block";
+
+            document.getElementById("captureButton").style.display = "inline-block";
+            document.getElementById("retakeButton").style.display = "none";
+
+            cameraMessage.textContent = "Camera is ready. Capture the issue photo.";
+
+        } catch (error) {
+
+            cameraMessage.textContent =
+                "Unable to access camera. Please allow camera permission.";
+
+        }
+
+    });
+
+
+    document.getElementById("captureButton").addEventListener("click", function () {
+
+        const video = document.getElementById("cameraPreview");
+        const canvas = document.getElementById("photoCanvas");
+        const preview = document.getElementById("photoPreview");
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const context = canvas.getContext("2d");
+
+        context.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        canvas.toBlob(function (blob) {
+
+            if (!blob) {
+                document.getElementById("cameraMessage").textContent =
+                    "Unable to create photo.";
+                return;
+            }
+
+            capturedImage = new File(
+                [blob],
+                "civentre-issue-photo.jpg",
+                {
+                    type: "image/jpeg",
+                    lastModified: Date.now()
+                }
+            );
+
+            preview.src = URL.createObjectURL(blob);
+            preview.style.display = "block";
+
+            document.getElementById("cameraMessage").textContent =
+                "Photo captured successfully.";
+
+        }, "image/jpeg");
+
+        document.getElementById("captureButton").style.display = "none";
+        document.getElementById("retakeButton").style.display = "inline-block";
+
+        if (cameraStream) {
+
+            cameraStream.getTracks().forEach(track => track.stop());
+
+        }
+
+    });
+
+
+    document.getElementById("retakeButton").addEventListener("click", function () {
+
+        capturedImage = null;
+
+        document.getElementById("photoPreview").style.display = "none";
+
+        document.getElementById("retakeButton").style.display = "none";
+
+        document.getElementById("cameraButton").click();
+
+    });
+
+
+    async function checkForDuplicates() {
+
+        const title =
+            document.getElementById("title").value.trim();
+
+        const category =
+            document.getElementById("category").value;
+
+        const location =
+            document.getElementById("location").value.trim();
+
+        const latitude =
+            document.getElementById("latitude").value;
+
+        const longitude =
+            document.getElementById("longitude").value;
+
+        if (!title || !category || !location) {
+            return [];
+        }
+
+        const params = new URLSearchParams();
+
+        params.append("title", title);
+        params.append("category", category);
+        params.append("location", location);
+
+        if (latitude && longitude) {
+            params.append("latitude", latitude);
+            params.append("longitude", longitude);
+        }
+
+        const response =
+            await fetch(
+                `/api/issues/duplicates?${params.toString()}`
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Unable to check for duplicate issues"
+            );
+        }
+
+        return await response.json();
+    }
+
+    function displayDuplicates(duplicates) {
+
+        const duplicateSection =
+            document.getElementById("duplicateSection");
+
+        const duplicateList =
+            document.getElementById("duplicateList");
+
+        if (!duplicates || duplicates.length === 0) {
+
+            duplicateSection.style.display = "none";
+            duplicateList.innerHTML = "";
+
+            return;
+        }
+
+        duplicateSection.style.display = "block";
+
+        duplicateList.innerHTML =
+            duplicates.map(issue => `
+
+            <div class="duplicate-card">
+
+                <h4>
+                    ${escapeHtml(issue.title)}
+                </h4>
+
+                <p>
+                    <strong>Category:</strong>
+                    ${escapeHtml(issue.category)}
+                </p>
+
+                <p>
+                    <strong>Location:</strong>
+                    ${escapeHtml(issue.location)}
+                </p>
+
+                <p>
+                    <strong>Status:</strong>
+                    ${issue.status}
+                </p>
+
+                <p>
+                    <strong>Priority:</strong>
+                    ${issue.priority || "MEDIUM"}
+                </p>
+
+                <p>
+                    👍 ${issue.supportCount || 0} supporters
+                </p>
+
+                <a
+                    href="/issue-details/${issue.id}"
+                    class="duplicate-view-button">
+                    View Issue
+                </a>
+
+            </div>
+
+        `).join("");
+    }
+
+
+    // ADD THIS ALSO HERE
+    function escapeHtml(value) {
+
+        if (!value) {
+            return "";
+        }
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+        document.getElementById("issueForm").addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        try {
+
+        const duplicates = await checkForDuplicates();
+            event.preventDefault();
+        displayDuplicates(duplicates);
+
+        if (duplicates.length > 0) {
+
+        const proceed = confirm(
+        "Similar issues already exist. Do you still want to submit a new issue?"
+        );
+
+        if (!proceed) {
+        return;
+    }
+    }
+
+        const formData = new FormData();
+
+        formData.append(
+        "title",
+        document.getElementById("title").value
+        );
+
+        formData.append(
+        "description",
+        document.getElementById("description").value
+        );
+
+        formData.append(
+        "category",
+        document.getElementById("category").value
+        );
+
+        formData.append(
+        "location",
+        document.getElementById("location").value
+        );
+
+            const latitude =
+                document.getElementById("latitude").value;
+
+            const longitude =
+                document.getElementById("longitude").value;
+
+            if (latitude && longitude) {
+
+                formData.append("latitude", latitude);
+                formData.append("longitude", longitude);
+
+            }
+
+        let image =
+        document.getElementById("image").files[0];
+
+        if (capturedImage) {
+        image = capturedImage;
+    }
+
+        if (image) {
+        formData.append("image", image);
+    }
+
+        const response =
+        await fetch("/api/issues", {
+            method: "POST",
+            headers: {
+                "X-XSRF-TOKEN": getCsrfToken()
+            },
+            body: formData
+        });
+
+        const message =
+        document.getElementById("message");
+
+        if (response.ok) {
+
+        message.textContent =
+        "Issue reported successfully!";
+
+        document.getElementById("issueForm").reset();
+
+        document.getElementById("duplicateSection").style.display =
+        "none";
+
+        document.getElementById("duplicateList").innerHTML =
+        "";
+
+        } else {
+
+            const errorData = await response.json();
+
+            if (errorData.errors) {
+
+                const errors = Object.values(errorData.errors);
+
+                message.textContent =
+                    errors.join(" ");
+
+            } else if (errorData.message) {
+
+                message.textContent =
+                    errorData.message;
+
+            } else {
+
+                message.textContent =
+                    "Please check your input and try again.";
+
+            }
+
+            message.className = "error-message";
+
+        }
+    } catch (error) {
+
+        console.error(
+        "Error while reporting issue:",
+        error
+        );
+
+        document.getElementById("message").textContent =
+        "Something went wrong. Please try again.";
+    }
+
+    });
+
+</script>
+
+
+</body>
+</html>

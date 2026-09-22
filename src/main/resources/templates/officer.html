@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Civentre - Officer Dashboard</title>
+
+    <style>
+
+        /* =========================================================
+           GLOBAL
+        ========================================================= */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #F5F7FA;
+            color: #425466;
+            line-height: 1.5;
+        }
+
+
+        /* =========================================================
+           HEADER
+        ========================================================= */
+
+        .header {
+            background: #123B5D;
+            color: #FFFFFF;
+
+            padding: 24px 48px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow:
+                    0 4px 18px rgba(15, 23, 42, 0.14);
+        }
+
+        .header h1 {
+            margin-bottom: 5px;
+
+            color: #FFFFFF;
+
+            font-size: 26px;
+            font-weight: 800;
+
+            letter-spacing: -0.4px;
+        }
+
+        .header p {
+            color: #D7E3EE;
+
+            font-size: 14px;
+        }
+
+        .logout {
+            display: inline-block;
+
+            padding: 10px 18px;
+
+            background: #FFFFFF;
+            color: #123B5D;
+
+            border: 1px solid #D9E2EC;
+
+            border-radius: 8px;
+
+            text-decoration: none;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            transition:
+                    background 0.2s ease,
+                    color 0.2s ease,
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease;
+        }
+
+        .logout:hover {
+            background: #EAF2F8;
+            color: #125A91;
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                    0 5px 12px rgba(0, 0, 0, 0.12);
+        }
+
+
+        /* =========================================================
+           MAIN CONTAINER
+        ========================================================= */
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            padding: 36px 28px 70px;
+        }
+
+
+        /* =========================================================
+           WELCOME CARD
+        ========================================================= */
+
+        .welcome {
+            margin-bottom: 26px;
+
+            padding: 25px 28px;
+
+            background: #FFFFFF;
+
+            border: 1px solid #D9E2EC;
+
+            border-radius: 14px;
+
+            box-shadow:
+                    0 6px 20px rgba(15, 23, 42, 0.06);
+        }
+
+        .welcome h2 {
+            margin-bottom: 7px;
+
+            color: #172B4D;
+
+            font-size: 21px;
+            font-weight: 750;
+        }
+
+        .welcome p {
+            color: #667085;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================================================
+           STATISTICS
+        ========================================================= */
+
+        .stats {
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 28px;
+        }
+
+        .card {
+            position: relative;
+
+            padding: 23px;
+
+            background: #FFFFFF;
+
+            border: 1px solid #D9E2EC;
+
+            border-radius: 14px;
+
+            box-shadow:
+                    0 6px 20px rgba(15, 23, 42, 0.06);
+
+            transition:
+                    transform 0.22s ease,
+                    box-shadow 0.22s ease,
+                    border-color 0.22s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+
+            border-color: #C8D4DF;
+
+            box-shadow:
+                    0 13px 30px rgba(15, 23, 42, 0.10);
+        }
+
+        .card h3 {
+            margin-bottom: 11px;
+
+            color: #667085;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.35px;
+        }
+
+        .card p {
+            color: #1769AA;
+
+            font-size: 30px;
+
+            font-weight: 800;
+
+            line-height: 1;
+        }
+
+
+        /* =========================================================
+           ASSIGNED ISSUES SECTION
+        ========================================================= */
+
+        .issues-section {
+            padding: 26px;
+
+            background: #FFFFFF;
+
+            border: 1px solid #D9E2EC;
+
+            border-radius: 14px;
+
+            box-shadow:
+                    0 6px 20px rgba(15, 23, 42, 0.06);
+        }
+
+        .issues-section h2 {
+            margin-bottom: 20px;
+
+            color: #172B4D;
+
+            font-size: 21px;
+
+            font-weight: 750;
+        }
+
+
+        /* =========================================================
+           TABLE
+        ========================================================= */
+
+        .table-container {
+            width: 100%;
+
+            overflow-x: auto;
+
+            border: 1px solid #E1E8EF;
+
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 950px;
+        }
+
+        th,
+        td {
+            padding: 14px 13px;
+
+            text-align: left;
+
+            border-bottom: 1px solid #E5EAF0;
+
+            font-size: 13px;
+        }
+
+        th {
+            background: #F5F8FB;
+
+            color: #344054;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.3px;
+
+            white-space: nowrap;
+        }
+
+        td {
+            color: #425466;
+
+            background: #FFFFFF;
+
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            transition:
+                    background 0.18s ease;
+        }
+
+        tbody tr:hover td {
+            background: #F8FAFC;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+
+        /* =========================================================
+           STATUS BADGES
+        ========================================================= */
+
+        .status {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            min-width: 78px;
+
+            padding: 6px 10px;
+
+            border-radius: 999px;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            text-transform: capitalize;
+
+            letter-spacing: 0.2px;
+        }
+
+
+        /* Assigned */
+
+        .status.assigned {
+            background: #F2F4F7;
+
+            color: #475467;
+
+            border: 1px solid #D0D5DD;
+        }
+
+
+        /* In Progress */
+
+        .status.in_progress {
+            background: #E8F3F8;
+
+            color: #17637A;
+
+            border: 1px solid #BFDCE7;
+        }
+
+
+        /* Resolved */
+
+        .status.resolved {
+            background: #EAF7EF;
+
+            color: #18864B;
+
+            border: 1px solid #B7E2C5;
+        }
+
+
+        /* Verified */
+
+        .status.verified {
+            background: #EAF2F8;
+
+            color: #1769AA;
+
+            border: 1px solid #C9DCE9;
+        }
+
+
+        /* Reported */
+
+        .status.reported {
+            background: #FFFAF0;
+
+            color: #B54708;
+
+            border: 1px solid #F2D6A2;
+        }
+
+
+        /* Closed */
+
+        .status.closed {
+            background: #F2F4F7;
+
+            color: #475467;
+
+            border: 1px solid #D0D5DD;
+        }
+
+
+        /* Rejected */
+
+        .status.rejected {
+            background: #FFF0F0;
+
+            color: #B42318;
+
+            border: 1px solid #FECACA;
+        }
+
+
+        /* =========================================================
+           ACTION CONTAINER
+        ========================================================= */
+
+        .action-container {
+            display: flex;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 7px;
+        }
+
+
+        /* =========================================================
+           ACTION BUTTON
+        ========================================================= */
+
+        .action-button {
+            padding: 8px 12px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            color: #FFFFFF;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            white-space: nowrap;
+
+            transition:
+                    background 0.2s ease,
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+        }
+
+
+        /* =========================================================
+           START WORK
+        ========================================================= */
+
+        .start-button {
+            background: #1769AA;
+
+            box-shadow:
+                    0 3px 8px rgba(23, 105, 170, 0.15);
+        }
+
+        .start-button:hover {
+            background: #125A91;
+
+            box-shadow:
+                    0 5px 12px rgba(23, 105, 170, 0.22);
+        }
+
+
+        /* =========================================================
+           RESOLVE
+        ========================================================= */
+
+        .resolve-button {
+            background: #18864B;
+
+            box-shadow:
+                    0 3px 8px rgba(24, 134, 75, 0.14);
+        }
+
+        .resolve-button:hover {
+            background: #14733F;
+
+            box-shadow:
+                    0 5px 12px rgba(24, 134, 75, 0.20);
+        }
+
+
+        /* =========================================================
+           VIEW DETAILS
+        ========================================================= */
+
+        .view-button {
+            background: #526071;
+
+            box-shadow:
+                    0 3px 8px rgba(82, 96, 113, 0.12);
+        }
+
+        .view-button:hover {
+            background: #3F4C5C;
+
+            box-shadow:
+                    0 5px 12px rgba(63, 76, 92, 0.18);
+        }
+
+
+        /* =========================================================
+           COMPLETED
+        ========================================================= */
+
+        .completed {
+            display: inline-flex;
+
+            align-items: center;
+
+            padding: 7px 10px;
+
+            background: #EAF7EF;
+
+            color: #18864B;
+
+            border: 1px solid #B7E2C5;
+
+            border-radius: 7px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+
+        /* =========================================================
+           EMPTY STATE
+        ========================================================= */
+
+        .empty {
+            padding: 35px 20px;
+
+            color: #667085;
+
+            text-align: center;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================================================
+           ERROR
+        ========================================================= */
+
+        .error {
+            padding: 25px 20px;
+
+            color: #B42318;
+
+            text-align: center;
+
+            font-size: 14px;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================================================
+           RESPONSIVE — 1000px
+        ========================================================= */
+
+        @media (max-width: 1000px) {
+
+            .header {
+                padding: 22px 30px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+
+        /* =========================================================
+           RESPONSIVE — 700px
+        ========================================================= */
+
+        @media (max-width: 700px) {
+
+            .header {
+                padding: 20px;
+
+                gap: 18px;
+
+                align-items: flex-start;
+            }
+
+            .header h1 {
+                font-size: 21px;
+            }
+
+            .header p {
+                font-size: 13px;
+            }
+
+            .logout {
+                padding: 9px 13px;
+
+                font-size: 12px;
+            }
+
+            .container {
+                padding: 25px 16px 50px;
+            }
+
+            .welcome {
+                padding: 21px;
+
+                border-radius: 13px;
+            }
+
+            .welcome h2 {
+                font-size: 19px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+
+                gap: 14px;
+            }
+
+            .card {
+                padding: 21px;
+            }
+
+            .card p {
+                font-size: 28px;
+            }
+
+            .issues-section {
+                padding: 19px;
+
+                border-radius: 13px;
+            }
+
+            .issues-section h2 {
+                font-size: 19px;
+            }
+
+        }
+
+
+        /* =========================================================
+           RESPONSIVE — 450px
+        ========================================================= */
+
+        @media (max-width: 450px) {
+
+            .header {
+                flex-direction: column;
+            }
+
+            .logout {
+                align-self: flex-start;
+            }
+            .container {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            .welcome {
+                padding: 18px;
+            }
+            .issues-section {
+                padding: 15px;
+            }
+            .table-container {
+                border-radius: 8px;
+            }
+
+            th,
+            td {
+                padding: 12px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- =========================
+     HEADER
+========================= -->
+
+<div class="header">
+
+    <div>
+        <h1>
+            Civentre Officer Dashboard
+        </h1>
+        <p>
+            Field Officer Management Panel
+        </p>
+
+    </div>
+
+    <form action="/logout"
+          method="post"
+          style="display: inline;">
+
+        <input type="hidden"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}">
+
+        <button type="submit"
+                class="logout">
+
+            Logout
+
+        </button>
+
+    </form>
+
+
+
+</div>
+
+
+
+<div class="container">
+
+
+    <!-- =========================
+         WELCOME
+    ========================= -->
+
+    <div class="welcome">
+
+        <h2>
+            Welcome, Officer 👋
+        </h2>
+
+
+        <p>
+            Manage your assigned public issues and update their progress.
+        </p>
+
+    </div>
+
+
+
+    <!-- =========================
+         STATISTICS
+    ========================= -->
+
+    <div class="stats">
+
+
+        <div class="card">
+
+            <h3>
+                Assigned Issues
+            </h3>
+
+
+            <p id="totalIssues">
+                0
+            </p>
+
+        </div>
+
+
+
+        <div class="card">
+
+            <h3>
+                Pending
+            </h3>
+
+
+            <p id="pendingIssues">
+                0
+            </p>
+
+        </div>
+
+
+
+        <div class="card">
+
+            <h3>
+                In Progress
+            </h3>
+
+
+            <p id="inProgressIssues">
+                0
+            </p>
+
+        </div>
+
+
+
+        <div class="card">
+
+            <h3>
+                Resolved
+            </h3>
+
+
+            <p id="resolvedIssues">
+                0
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         ASSIGNED ISSUES
+    ========================= -->
+
+    <div class="issues-section">
+
+        <h2>
+            My Assigned Issues
+        </h2>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Title</th>
+
+                    <th>Category</th>
+
+                    <th>Location</th>
+
+                    <th>Priority</th>
+
+                    <th>Status</th>
+
+                    <th>Reported Date</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody id="issuesTableBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    function getCsrfToken() {
+
+        const cookie = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("XSRF-TOKEN="));
+
+        return cookie
+            ? decodeURIComponent(cookie.split("=")[1])
+            : null;
+    }
+
+
+    // =====================================================
+    // LOAD OFFICER STATISTICS
+    // =====================================================
+
+    async function loadStats() {
+
+        try {
+
+            const response =
+                await fetch("/api/officer/stats");
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to load statistics"
+                );
+
+            }
+
+
+            const stats =
+                await response.json();
+
+
+            document.getElementById(
+                "totalIssues"
+            ).textContent =
+                stats.total;
+
+
+            document.getElementById(
+                "pendingIssues"
+            ).textContent =
+                stats.pending;
+
+
+            document.getElementById(
+                "inProgressIssues"
+            ).textContent =
+                stats.inProgress;
+
+
+            document.getElementById(
+                "resolvedIssues"
+            ).textContent =
+                stats.resolved;
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Statistics error:",
+                error
+            );
+
+        }
+
+    }
+
+
+
+    // =====================================================
+    // LOAD ASSIGNED ISSUES
+    // =====================================================
+
+    async function loadIssues() {
+
+        const tableBody =
+            document.getElementById(
+                "issuesTableBody"
+            );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/officer/issues"
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to load assigned issues"
+                );
+
+            }
+
+
+            const issues =
+                await response.json();
+
+
+            tableBody.innerHTML = "";
+
+
+            // =================================================
+            // NO ISSUES
+            // =================================================
+
+            if (issues.length === 0) {
+
+                tableBody.innerHTML = `
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            class="empty">
+
+                            No issues have been assigned
+                            to you yet.
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+                return;
+
+            }
+
+
+
+            // =================================================
+            // DISPLAY ISSUES
+            // =================================================
+
+            issues.forEach(issue => {
+
+                const row =
+                    document.createElement("tr");
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${issue.id}
+                    </td>
+
+
+                    <td>
+                        ${issue.title}
+                    </td>
+
+
+                    <td>
+                        ${issue.category}
+                    </td>
+
+
+                    <td>
+                        ${issue.location}
+                    </td>
+
+
+                    <td>
+                        ${issue.priority}
+                    </td>
+
+
+                    <td>
+
+                        <span
+                            class="status ${issue.status.toLowerCase()}">
+
+                            ${issue.status.replace("_", " ")}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+                        ${formatDate(issue.createdAt)}
+                    </td>
+
+
+                    <td>
+
+                        ${getActionButton(issue)}
+
+                    </td>
+
+                `;
+
+
+                tableBody.appendChild(row);
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Issues error:",
+                error
+            );
+
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="8"
+                        class="error">
+                        Unable to load assigned issues.
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // =====================================================
+    // GET ACTION BUTTON
+    // =====================================================
+
+    function getActionButton(issue) {
+        let actionButton = "";
+
+
+        // =================================================
+        // ASSIGNED → START WORK
+        // =================================================
+
+        if (issue.status === "ASSIGNED") {
+            actionButton = `
+                <button
+                    class="action-button start-button"
+                    onclick="updateStatus(${issue.id}, 'IN_PROGRESS')">
+                    Start Work
+                </button>
+            `;
+        }
+
+
+            // =================================================
+            // IN PROGRESS → RESOLVE
+        // =================================================
+
+        else if (
+            issue.status === "IN_PROGRESS"
+        ) {
+            actionButton = `
+                <button
+                    class="action-button resolve-button"
+                    onclick="updateStatus(${issue.id}, 'RESOLVED')">
+                  Mark Resolved
+                </button>
+            `;
+        }
+
+
+            // =================================================
+            // RESOLVED
+        // =================================================
+
+        else if (
+            issue.status === "RESOLVED"
+        ) {
+            actionButton = `
+                <span class="completed">
+                    Completed
+                </span>
+            `;
+        }
+
+        // =================================================
+        // VIEW DETAILS
+        // =================================================
+
+        const viewButton = `
+            <button
+                class="action-button view-button"
+                onclick="viewIssue(${issue.id})">
+                View Details
+          </button>
+        `;
+
+        // =================================================
+        // RETURN ACTIONS
+        // =================================================
+
+        return `
+            <div class="action-container">
+                ${actionButton}
+                ${viewButton}
+            </div>
+        `;
+    }
+
+    // =====================================================
+    // UPDATE ISSUE STATUS
+    // =====================================================
+
+    async function updateStatus(
+        issueId,
+        status
+    ) {
+        let remarks = "";
+
+
+        // =================================================
+        // START WORK REMARKS
+        // =================================================
+
+        if (status === "IN_PROGRESS") {
+            remarks =
+                prompt(
+                    "Enter remarks before starting the work:"
+                );
+            if (remarks === null) {
+                return;
+            }
+            if (remarks.trim() === "") {
+                alert(
+                    "Please enter remarks before starting the work."
+                );
+                return;
+            }
+        }
+
+
+        // =================================================
+        // RESOLUTION REMARKS
+        // =================================================
+
+        if (status === "RESOLVED") {
+            remarks =
+                prompt(
+                    "Enter resolution remarks:"
+                );
+            if (remarks === null) {
+                return;
+            }
+            if (remarks.trim() === "") {
+                alert(
+                    "Please enter resolution remarks."
+                );
+                return;
+            }
+        }
+
+
+        // =================================================
+        // SEND JSON REQUEST
+        // =================================================
+
+        try {
+
+            const response =
+                await fetch(
+                    `/api/officer/issues/${issueId}/status`,
+                    {
+                        method: "PUT",
+
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-XSRF-TOKEN": getCsrfToken()
+                        },
+                        body: JSON.stringify({
+                            status: status,
+                            remarks: remarks.trim()
+                        })
+                    }
+                );
+
+
+            // =================================================
+            // READ RESPONSE
+            // =================================================
+
+            const responseText =
+                await response.text();
+
+
+            let responseData = null;
+
+
+            try {
+
+                responseData =
+                    JSON.parse(responseText);
+
+            }
+
+            catch (error) {
+
+                responseData = null;
+
+            }
+
+
+            // =================================================
+            // HANDLE BACKEND ERROR
+            // =================================================
+
+            if (!response.ok) {
+
+                const errorMessage =
+                    responseData &&
+                    responseData.message
+                        ? responseData.message
+                        : responseText ||
+                        "Unable to update the issue.";
+
+                console.error(
+                    "Backend error:",
+                    response.status,
+                    responseText
+                );
+
+                alert(
+                    "Update failed:\n\n" +
+                    errorMessage
+                );
+
+                return;
+
+            }
+
+
+            // =================================================
+            // SUCCESS
+            // =================================================
+
+            if (status === "IN_PROGRESS") {
+
+                alert(
+                    "Work started successfully!"
+                );
+
+            }
+
+            else if (status === "RESOLVED") {
+
+                alert(
+                    "Issue marked as resolved successfully!"
+                );
+
+            }
+
+
+            // =================================================
+            // REFRESH DASHBOARD
+            // =================================================
+
+            await loadStats();
+
+            await loadIssues();
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Status update error:",
+                error
+            );
+
+
+            alert(
+                "Unable to connect to the server. Please try again."
+            );
+
+        }
+
+    }
+
+
+
+    // =====================================================
+    // VIEW ISSUE DETAILS
+    // =====================================================
+
+    function viewIssue(issueId) {
+
+        window.location.href =
+            `/officer/issues/${issueId}`;
+
+    }
+
+
+
+    // =====================================================
+    // FORMAT DATE
+    // =====================================================
+
+    function formatDate(dateString) {
+
+        if (!dateString) {
+
+            return "-";
+
+        }
+
+
+        const date =
+            new Date(dateString);
+
+
+        return date.toLocaleDateString();
+
+    }
+
+
+
+    // =====================================================
+    // INITIAL LOAD
+    // =====================================================
+
+    loadStats();
+
+    loadIssues();
+
+
+</script>
+
+</body>
+</html>

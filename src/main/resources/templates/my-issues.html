@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Civentre - My Issues</title>
+
+    <link rel="stylesheet" href="/my-issues.css">
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        Civentre
+    </div>
+
+    <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/report-issue">Report Issue</a>
+        <a href="/my-issues">My Issues</a>
+        <a href="/notifications">Notifications</a>
+    </nav>
+
+    <div class="profile">
+        <span>Citizen</span>
+        <a href="/logout">Logout</a>
+    </div>
+
+</header>
+
+
+<main class="issues-container">
+
+    <section class="page-header">
+
+        <h1>My Issues</h1>
+
+        <p>
+            View and track the public issues you have reported.
+        </p>
+
+    </section>
+
+
+    <section id="issuesList">
+
+        <p class="loading">
+            Loading your issues...
+        </p>
+
+    </section>
+
+</main>
+
+
+<script>
+    function getCsrfToken() {
+
+        const cookie = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("XSRF-TOKEN="));
+
+        return cookie
+            ? decodeURIComponent(cookie.split("=")[1])
+            : null;
+    }
+
+    async function loadMyIssues() {
+
+        const response = await fetch("/api/issues/my");
+
+        if (!response.ok) {
+            document.getElementById("issuesList").innerHTML = `
+                <div class="empty-message">
+                    <h2>Unable to load issues</h2>
+                    <p>Please try again later.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const issues = await response.json();
+
+        const issuesList =
+            document.getElementById("issuesList");
+
+        if (issues.length === 0) {
+
+            issuesList.innerHTML = `
+                <div class="empty-message">
+                    <h2>No Issues Reported</h2>
+                    <p>You have not reported any public issues yet.</p>
+                    <a href="/report-issue">Report an Issue</a>
+                </div>
+            `;
+
+            return;
+        }
+
+        issuesList.innerHTML = "";
+
+        /*
+         * Get issueId from the URL.
+         *
+         * Example:
+         * /my-issues?issueId=3
+         */
+        const urlParams =
+            new URLSearchParams(window.location.search);
+
+        const selectedIssueId =
+            urlParams.get("issueId");
+
+
+        for (const issue of issues) {
+
+            const historyResponse =
+                await fetch(`/api/issues/${issue.id}/history`);
+
+            const history =
+                historyResponse.ok
+                    ? await historyResponse.json()
+                    : [];
+
+            const completedStatuses =
+                history.map(update => update.status);
+
+
+            const issueCard =
+                document.createElement("div");
+
+            issueCard.className = "issue-card";
+
+            /*
+             * Highlight the issue selected from Dashboard.
+             */
+            if (selectedIssueId &&
+                String(issue.id) === String(selectedIssueId)) {
+
+                issueCard.classList.add("selected-issue");
+            }
+
+
+            issueCard.id = `issue-${issue.id}`;
+
+
+            issueCard.innerHTML = `
+
+                <div class="issue-header">
+
+                    <h2>${issue.title}</h2>
+
+                    <span class="status">
+                        ${issue.status}
+                    </span>
+
+                </div>
+
+
+                <p class="description">
+                    ${issue.description}
+                </p>
+
+
+                <div class="status-timeline">
+
+                    <div class="status-step ${
+                completedStatuses.includes('REPORTED')
+                    ? 'completed'
+                    : ''
+            }">
+                        <span>📝</span>
+                        <strong>Reported</strong>
+                    </div>
+
+
+                    <div class="status-step ${
+                completedStatuses.includes('VERIFIED')
+                    ? 'completed'
+                    : ''
+            }">
+                        <span>✅</span>
+                        <strong>Verified</strong>
+                    </div>
+
+
+                    <div class="status-step ${
+                completedStatuses.includes('ASSIGNED')
+                    ? 'completed'
+                    : ''
+            }">
+                        <span>👤</span>
+                        <strong>Assigned</strong>
+                    </div>
+
+
+                    <div class="status-step ${
+                completedStatuses.includes('IN_PROGRESS')
+                    ? 'completed'
+                    : ''
+            }">
+                        <span>🔄</span>
+                        <strong>In Progress</strong>
+                    </div>
+
+
+                    <div class="status-step ${
+                completedStatuses.includes('RESOLVED')
+                    ? 'completed'
+                    : ''
+            }">
+                        <span>🎉</span>
+                        <strong>Resolved</strong>
+                    </div>
+
+
+                    <div class="status-step ${
+                completedStatuses.includes('CLOSED')
+                    ? 'completed'
+                    : ''
+            }">
+                        <span>🔒</span>
+                        <strong>Closed</strong>
+                    </div>
+
+                </div>
+
+
+                ${issue.imagePath ? `
+                    <div class="issue-image">
+                        <img
+                            src="/uploads/${issue.imagePath}"
+                            alt="Issue Image">
+                    </div>
+                ` : ""}
+
+                ${issue.resolutionImagePath ? `
+    <div class="issue-image">
+        <h3>Resolution Photo</h3>
+
+        <img
+            src="/uploads/${issue.resolutionImagePath}"
+            alt="Resolution Photo">
+    </div>
+` : ""}
+                ${issue.status !== "CLOSED" ? `
+    <div class="support-section">
+
+        <button
+            class="support-button"
+            onclick="supportIssue(${issue.id})">
+
+            👍 Support this issue
+
+        </button>
+
+        <span class="support-count">
+            ${issue.supportCount || 0} supporters
+        </span>
+
+    </div>
+` : ""}
+               ${issue.status === "RESOLVED" && !issue.citizenConfirmed ? `
+    <div class="confirmation-section">
+
+        <div class="confirmation-icon">
+            ✓
+        </div>
+
+        <div class="confirmation-content">
+
+            <h3>Issue Marked as Resolved</h3>
+
+            <p>
+                Our field officer has marked this issue as resolved.
+                Please review the resolution photo and confirm that
+                the issue has been properly fixed.
+            </p>
+
+            <button
+                class="confirm-button"
+                onclick="confirmResolution(${issue.id})">
+                ✓ Confirm Resolution
+            </button>
+
+            <div
+                id="confirmationMessage"
+                class="confirmation-message">
+            </div>
+
+        </div>
+
+    </div>
+` : ""}
+
+
+                <div class="issue-details">
+
+                    <div>
+                        <strong>Category</strong>
+                        <span>${issue.category}</span>
+                    </div>
+
+
+                    <div>
+                        <strong>Location</strong>
+                        <span>${issue.location}</span>
+                    </div>
+
+
+                    <div>
+                        <strong>Priority</strong>
+                        <span>${issue.priority}</span>
+                    </div>
+
+
+                   <div>
+    <strong>Reported On</strong>
+    <span>
+        ${issue.createdAt
+                ? issue.createdAt.replace("T", " ").substring(0, 16)
+                : "Date unavailable"}
+    </span>
+</div>
+
+                </div>
+
+            `;
+
+
+            issuesList.appendChild(issueCard);
+
+        }
+
+
+        /*
+         * If Dashboard opened a specific issue,
+         * scroll directly to that issue.
+         */
+        if (selectedIssueId) {
+
+            const selectedIssue =
+                document.getElementById(
+                    `issue-${selectedIssueId}`
+                );
+
+            if (selectedIssue) {
+
+                setTimeout(() => {
+
+                    selectedIssue.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+
+                }, 300);
+
+            }
+
+        }
+
+    }
+
+
+    loadMyIssues();
+
+    async function confirmResolution(issueId) {
+
+        const confirmed = confirm(
+            "Are you sure this issue has been properly resolved?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+
+            const response = await fetch(
+                `/api/issues/${issueId}/confirm`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "X-XSRF-TOKEN": getCsrfToken()
+                    }
+                }
+            );
+
+            const responseText = await response.text();
+
+            if (!response.ok) {
+                throw new Error(responseText || "Failed to confirm resolution");
+            }
+
+            const message =
+                document.getElementById("confirmationMessage");
+
+            if (message) {
+                message.textContent =
+                    "Resolution confirmed successfully. The issue is now closed.";
+                message.style.color = "green";
+            }
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+
+        } catch (error) {
+
+            const message =
+                document.getElementById("confirmationMessage");
+
+            if (message) {
+                message.textContent =
+                    "Failed: " + error.message;
+                message.style.color = "red";
+            }
+        }
+    }
+    // ==============================
+    // Support Issue
+    // ==============================
+
+    async function supportIssue(issueId) {
+
+        const confirmed = confirm(
+            "Do you want to support this public issue?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `/api/issues/${issueId}/support`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "X-XSRF-TOKEN": getCsrfToken()
+                    }
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Failed to support issue"
+                );
+            }
+
+            alert(
+                "You supported this issue successfully!"
+            );
+
+            window.location.reload();
+
+        } catch (error) {
+
+            console.error(
+                "Support issue error:",
+                error
+            );
+
+            alert(
+                "Failed to support issue: " +
+                error.message
+            );
+        }
+    }
+
+</script>
+</body>
+</html>

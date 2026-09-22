@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Notifications | Civentre</title>
+
+    <style>
+
+        /* =========================================================
+           GLOBAL
+        ========================================================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #F5F7FA;
+            color: #425466;
+            line-height: 1.5;
+        }
+
+
+        /* =========================================================
+           NAVBAR
+        ========================================================= */
+
+        .navbar {
+            min-height: 72px;
+
+            display: flex;
+            align-items: center;
+
+            padding: 0 48px;
+
+            background: #123B5D;
+
+            border-bottom: 1px solid #0D314E;
+
+            box-shadow:
+                    0 4px 18px rgba(15, 23, 42, 0.14);
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            margin-right: 55px;
+
+            color: #FFFFFF;
+
+            font-size: 27px;
+            font-weight: 800;
+
+            letter-spacing: -0.5px;
+        }
+
+        .navbar nav {
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            flex: 1;
+        }
+
+        .navbar nav a {
+            position: relative;
+
+            padding: 10px 13px;
+
+            color: #D7E3EE;
+
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            border-radius: 8px;
+
+            transition:
+                    background 0.2s ease,
+                    color 0.2s ease,
+                    transform 0.2s ease;
+        }
+
+        .navbar nav a:hover {
+            background: #1B4A6D;
+            color: #FFFFFF;
+        }
+
+        /* Active Notifications link */
+
+        .navbar nav a[href="/notifications"] {
+            color: #FFFFFF;
+        }
+
+        .navbar nav a[href="/notifications"]::after {
+            content: "";
+
+            position: absolute;
+
+            left: 13px;
+            right: 13px;
+            bottom: 5px;
+
+            height: 2px;
+
+            background: #60A5FA;
+
+            border-radius: 10px;
+        }
+
+
+        /* =========================================================
+           PROFILE
+        ========================================================= */
+
+        .profile {
+            display: flex;
+            align-items: center;
+
+            gap: 14px;
+        }
+
+        .profile span {
+            padding: 8px 12px;
+
+            background: #1B486B;
+
+            border: 1px solid #315675;
+
+            border-radius: 20px;
+
+            color: #E5EEF6;
+
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .profile a {
+            padding: 8px 10px;
+
+            color: #D7E3EE;
+
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            border-radius: 8px;
+
+            transition:
+                    background 0.2s ease,
+                    color 0.2s ease;
+        }
+
+        .profile a:hover {
+            background: #1B4A6D;
+            color: #FFFFFF;
+        }
+
+
+        /* =========================================================
+           MAIN CONTAINER
+        ========================================================= */
+
+        .notifications-container {
+            width: 100%;
+            max-width: 900px;
+
+            margin: 0 auto;
+
+            padding: 44px 28px 70px;
+        }
+
+
+        /* =========================================================
+           PAGE HEADER
+        ========================================================= */
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            margin-bottom: 8px;
+
+            color: #172B4D;
+
+            font-size: 34px;
+            font-weight: 800;
+
+            letter-spacing: -0.7px;
+
+            line-height: 1.2;
+        }
+
+        .page-header p {
+            color: #667085;
+
+            font-size: 15px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =========================================================
+           NOTIFICATION LIST
+        ========================================================= */
+
+        #notificationList {
+            width: 100%;
+        }
+
+
+        /* =========================================================
+           NOTIFICATION CARD
+        ========================================================= */
+
+        .notification {
+            position: relative;
+
+            margin-bottom: 16px;
+
+            padding: 22px 24px;
+
+            background: #FFFFFF;
+
+            border: 1px solid #D9E2EC;
+
+            border-radius: 14px;
+
+            box-shadow:
+                    0 6px 20px rgba(15, 23, 42, 0.06);
+
+            transition:
+                    transform 0.22s ease,
+                    box-shadow 0.22s ease,
+                    border-color 0.22s ease;
+        }
+
+        .notification:hover {
+            transform: translateY(-3px);
+
+            border-color: #C8D4DF;
+
+            box-shadow:
+                    0 13px 30px rgba(15, 23, 42, 0.10);
+        }
+
+
+        /* =========================================================
+           UNREAD NOTIFICATION
+        ========================================================= */
+
+        .notification.unread {
+            border-left: 4px solid #1769AA;
+
+            background: #FFFFFF;
+        }
+
+
+        /* =========================================================
+           READ NOTIFICATION
+        ========================================================= */
+
+        .notification.read {
+            border-left: 4px solid #CBD5E1;
+
+            background: #F8FAFC;
+
+            opacity: 0.88;
+        }
+
+        .notification.read:hover {
+            opacity: 1;
+        }
+
+
+        /* =========================================================
+           MESSAGE
+        ========================================================= */
+
+        .message {
+            margin-bottom: 11px;
+
+            color: #172B4D;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            line-height: 1.6;
+        }
+
+
+        /* =========================================================
+           NOTIFICATION TYPE
+        ========================================================= */
+
+        .type {
+            display: inline-block;
+
+            padding: 5px 10px;
+
+            background: #EAF2F8;
+
+            color: #1769AA;
+
+            border: 1px solid #C9DCE9;
+
+            border-radius: 6px;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.3px;
+        }
+
+
+        /* =========================================================
+           DATE
+        ========================================================= */
+
+        .date {
+            margin-top: 13px;
+
+            color: #667085;
+
+            font-size: 12px;
+        }
+
+
+        /* =========================================================
+           STATUS
+        ========================================================= */
+
+        .status {
+            margin-top: 12px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+        .unread-text {
+            color: #1769AA;
+        }
+
+        .read-text {
+            color: #18864B;
+        }
+
+
+        /* =========================================================
+           MARK AS READ BUTTON
+        ========================================================= */
+
+        .notification button {
+            margin-top: 15px;
+
+            padding: 10px 16px;
+
+            background: #1769AA;
+
+            color: #FFFFFF;
+
+            border: none;
+
+            border-radius: 8px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow:
+                    0 3px 8px rgba(23, 105, 170, 0.16);
+
+            transition:
+                    background 0.2s ease,
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease;
+        }
+
+        .notification button:hover {
+            background: #125A91;
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                    0 6px 13px rgba(23, 105, 170, 0.22);
+        }
+
+        .notification button:active {
+            transform: translateY(0);
+        }
+
+
+        /* =========================================================
+           EMPTY STATE
+        ========================================================= */
+
+        .empty {
+            padding: 65px 25px;
+
+            text-align: center;
+
+            background: #FFFFFF;
+
+            border: 1px solid #D9E2EC;
+
+            border-radius: 16px;
+
+            color: #667085;
+
+            font-size: 14px;
+
+            box-shadow:
+                    0 7px 24px rgba(15, 23, 42, 0.06);
+        }
+
+
+        /* =========================================================
+           RESPONSIVE — 900px
+        ========================================================= */
+
+        @media (max-width: 900px) {
+
+            .navbar {
+                padding: 0 25px;
+            }
+
+            .logo {
+                margin-right: 25px;
+            }
+
+            .navbar nav {
+                gap: 4px;
+            }
+
+            .navbar nav a {
+                padding: 9px 9px;
+            }
+        }
+
+
+        /* =========================================================
+           RESPONSIVE — 700px
+        ========================================================= */
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                min-height: auto;
+
+                padding: 15px 18px;
+
+                flex-wrap: wrap;
+
+                gap: 12px;
+            }
+
+            .logo {
+                margin-right: auto;
+            }
+
+            .navbar nav {
+                order: 3;
+
+                width: 100%;
+
+                overflow-x: auto;
+
+                padding-bottom: 2px;
+
+                justify-content: flex-start;
+            }
+
+            .navbar nav a {
+                white-space: nowrap;
+            }
+
+            .profile {
+                gap: 7px;
+            }
+
+            .notifications-container {
+                padding: 32px 18px 50px;
+            }
+
+            .page-header h1 {
+                font-size: 28px;
+            }
+
+            .notification {
+                padding: 20px;
+            }
+        }
+
+
+        /* =========================================================
+           RESPONSIVE — 450px
+        ========================================================= */
+
+        @media (max-width: 450px) {
+
+            .navbar {
+                padding: 14px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .navbar nav a {
+                font-size: 12px;
+
+                padding: 8px 9px;
+            }
+
+            .profile span {
+                display: none;
+            }
+
+            .profile a {
+                font-size: 12px;
+            }
+
+            .notifications-container {
+                padding: 24px 13px 40px;
+            }
+
+            .page-header h1 {
+                font-size: 25px;
+            }
+
+            .page-header p {
+                font-size: 14px;
+            }
+
+            .notification {
+                padding: 18px;
+
+                border-radius: 12px;
+            }
+
+            .message {
+                font-size: 14px;
+            }
+
+            .notification button {
+                width: 100%;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        Civentre
+    </div>
+
+    <nav>
+
+        <a href="/">
+            Dashboard
+        </a>
+
+        <a href="/report">
+            Report Issue
+        </a>
+
+        <a href="/my-issues">
+            My Issues
+        </a>
+
+        <a href="/public-issues">
+            Public Issues
+        </a>
+
+        <a href="/notifications">
+            Notifications
+        </a>
+
+    </nav>
+
+    <div class="profile">
+        <span>
+            Citizen
+        </span>
+        <form action="/logout"
+              method="post"
+              style="display: inline;">
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
+            <button type="submit">
+                Logout
+            </button>
+        </form>
+    </div>
+
+</nav>
+
+
+<!-- =========================================================
+     MAIN CONTENT
+========================================================= -->
+
+<main class="notifications-container">
+
+
+    <section class="page-header">
+
+        <h1>
+            Notifications
+        </h1>
+
+        <p>
+            Stay updated on your reported issues, status changes,
+            assignments, and resolution updates.
+        </p>
+
+    </section>
+
+
+    <section id="notificationList">
+
+        <div class="empty">
+            Loading notifications...
+        </div>
+
+    </section>
+
+
+</main>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     Existing functionality preserved
+========================================================= -->
+
+<script>
+
+    function getCsrfToken() {
+        const cookie = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("XSRF-TOKEN="));
+
+        return cookie
+            ? decodeURIComponent(cookie.split("=")[1])
+            : null;
+    }
+
+    async function loadNotifications() {
+
+        const response = await fetch("/api/notifications");
+
+        if (!response.ok) {
+
+            document.getElementById("notificationList").innerHTML =
+                "<div class='empty'>Unable to load notifications.</div>";
+
+            return;
+        }
+
+        const notifications = await response.json();
+
+        const list = document.getElementById("notificationList");
+
+        if (notifications.length === 0) {
+
+            list.innerHTML =
+                "<div class='empty'>No notifications yet.</div>";
+
+            return;
+        }
+
+        list.innerHTML = "";
+
+        notifications.forEach(notification => {
+
+            const div = document.createElement("div");
+
+            div.className =
+                notification.read
+                    ? "notification read"
+                    : "notification unread";
+
+            div.innerHTML = `
+
+                <div class="message">
+                    ${notification.message}
+                </div>
+
+                <div class="type">
+                    Type: ${notification.type}
+                </div>
+
+                <div class="date">
+                    ${new Date(notification.createdAt).toLocaleString()}
+                </div>
+
+                <div class="status ${
+                notification.read
+                    ? "read-text"
+                    : "unread-text"
+            }">
+
+                    ${notification.read ? "✓ Read" : "● Unread"}
+
+                </div>
+
+                ${
+                notification.read
+                    ? ""
+                    : `<button onclick="markAsRead(${notification.id})">
+                                Mark as Read
+                           </button>`
+            }
+
+            `;
+            list.appendChild(div);
+        });
+    }
+    async function markAsRead(notificationId) {
+        const response = await fetch(`/api/notifications/${notificationId}/read`, {
+            method: "PUT",
+            headers: {
+                "X-XSRF-TOKEN": getCsrfToken()
+            }
+        });
+        if (!response.ok) {
+            alert("Unable to mark notification as read.");
+            return;
+        }
+
+        loadNotifications();
+    }
+    loadNotifications();
+</script>
+</body>
+</html>

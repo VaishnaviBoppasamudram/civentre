@@ -1,0 +1,855 @@
+/* =========================================================
+   CIVENTRE - PUBLIC ISSUE DETAILS
+   Real-world civic platform design
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #eef2f6;
+    color: #172033;
+}
+
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    min-height: 70px;
+    padding: 0 6%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 30px;
+
+    background: #123b5d;
+    color: #ffffff;
+
+    box-shadow: 0 3px 14px rgba(15, 23, 42, 0.18);
+}
+
+.logo {
+    flex-shrink: 0;
+
+    color: #ffffff;
+
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+}
+
+.nav-links a {
+    position: relative;
+
+    padding: 25px 0;
+
+    color: #d9e5ef;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
+    color: #ffffff;
+}
+
+.nav-links a.active {
+    color: #ffffff;
+}
+
+.nav-links a.active::after {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 17px;
+
+    height: 3px;
+
+    background: #62a8df;
+
+    border-radius: 10px;
+}
+
+.profile {
+    flex-shrink: 0;
+
+    padding: 8px 14px;
+
+    background: #1d4b6d;
+
+    border: 1px solid #376482;
+    border-radius: 8px;
+
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
+.details-container {
+    width: min(1120px, 92%);
+
+    margin: 0 auto;
+
+    padding: 35px 0 70px;
+}
+
+
+/* =========================================================
+   BACK LINK
+   ========================================================= */
+
+.back-section {
+    margin-bottom: 22px;
+}
+
+.back-section a {
+    display: inline-flex;
+    align-items: center;
+
+    color: #1769aa;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    transition:
+            color 0.2s ease,
+            transform 0.2s ease;
+}
+
+.back-section a:hover {
+    color: #125a91;
+
+    transform: translateX(-3px);
+}
+
+
+/* =========================================================
+   ISSUE HEADER
+   ========================================================= */
+
+.issue-header {
+    margin-bottom: 22px;
+
+    padding: 30px 32px;
+
+    background: #ffffff;
+
+    border: 1px solid #d5dee7;
+    border-radius: 16px;
+
+    box-shadow:
+            0 7px 20px rgba(15, 23, 42, 0.09);
+
+    transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease,
+            border-color 0.25s ease;
+}
+
+.issue-header:hover {
+    transform: translateY(-4px);
+
+    border-color: #b7c7d6;
+
+    box-shadow:
+            0 14px 30px rgba(15, 23, 42, 0.14);
+}
+
+.issue-header h1 {
+    margin: 0;
+
+    color: #12263a;
+
+    font-size: 30px;
+    font-weight: 800;
+
+    line-height: 1.35;
+
+    letter-spacing: -0.5px;
+}
+
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.badges {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 9px;
+
+    margin-top: 18px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 6px 12px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    border: 1px solid transparent;
+}
+
+
+/* Status */
+
+.status-reported {
+    background: #eef4f8;
+    color: #315b78;
+    border-color: #d4e2eb;
+}
+
+.status-verified {
+    background: #edf6f1;
+    color: #226342;
+    border-color: #cfe5d8;
+}
+
+.status-assigned {
+    background: #eef3f8;
+    color: #315d7c;
+    border-color: #d3e0ea;
+}
+
+.status-in_progress {
+    background: #fff6e8;
+    color: #9a5700;
+    border-color: #f2dbb5;
+}
+
+.status-resolved {
+    background: #edf8f1;
+    color: #187044;
+    border-color: #cce8d7;
+}
+
+.status-closed {
+    background: #edf7f2;
+    color: #176b46;
+    border-color: #cbe4d6;
+}
+
+.status-rejected {
+    background: #fdf0ef;
+    color: #a3312c;
+    border-color: #efcfcc;
+}
+
+
+/* Priority */
+
+.priority-high {
+    background: #fff1ed;
+    color: #a43f24;
+    border-color: #f1d0c6;
+}
+
+.priority-medium {
+    background: #fff7e8;
+    color: #986000;
+    border-color: #f0ddb5;
+}
+
+.priority-low {
+    background: #edf6f1;
+    color: #246442;
+    border-color: #cfe5d8;
+}
+
+
+/* =========================================================
+   DETAILS GRID
+   ========================================================= */
+
+.details-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 22px;
+}
+
+
+/* =========================================================
+   COMMON CARD
+   ========================================================= */
+
+.card {
+    min-width: 0;
+
+    padding: 26px;
+
+    background: #ffffff;
+
+    border: 1px solid #d5dee7;
+    border-radius: 15px;
+
+    box-shadow:
+            0 6px 18px rgba(15, 23, 42, 0.08);
+
+    transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease,
+            border-color 0.25s ease;
+}
+
+
+/* Visible cursor movement */
+
+.card:hover {
+    transform: translateY(-6px);
+
+    border-color: #b8c8d7;
+
+    box-shadow:
+            0 16px 32px rgba(15, 23, 42, 0.15);
+}
+
+
+/* Card heading */
+
+.card h2 {
+    margin: 0 0 18px;
+
+    color: #172b4d;
+
+    font-size: 18px;
+    font-weight: 750;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+   ========================================================= */
+
+.description {
+    margin: 0;
+
+    color: #465568;
+
+    font-size: 14px;
+
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   ISSUE INFORMATION
+   ========================================================= */
+
+.info-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.info-item {
+    padding: 13px 14px;
+
+    background: #f6f8fa;
+
+    border: 1px solid #dce4eb;
+
+    border-radius: 9px;
+
+    color: #344457;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+    transition:
+            transform 0.2s ease,
+            background 0.2s ease,
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.info-item:hover {
+    transform: translateX(4px);
+
+    background: #ffffff;
+
+    border-color: #b9cad9;
+
+    box-shadow:
+            0 5px 14px rgba(15, 23, 42, 0.08);
+}
+
+.info-item strong {
+    color: #66778a;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.4px;
+}
+
+
+/* =========================================================
+   IMAGES
+   ========================================================= */
+
+.issue-photo,
+.resolution-photo {
+    display: block;
+
+    width: 100%;
+
+    max-height: 380px;
+
+    object-fit: contain;
+
+    background: #f4f6f8;
+
+    border: 1px solid #d7e0e8;
+
+    border-radius: 11px;
+
+    transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
+}
+
+.issue-photo:hover,
+.resolution-photo:hover {
+    transform: scale(1.015);
+
+    box-shadow:
+            0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+
+/* =========================================================
+   NO IMAGE / NO DATA
+   ========================================================= */
+
+.no-image {
+    margin: 0;
+
+    padding: 28px 18px;
+
+    text-align: center;
+
+    background: #f6f8fa;
+
+    border: 1px dashed #cbd5df;
+
+    border-radius: 10px;
+
+    color: #718096;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   MAP
+   ========================================================= */
+
+#issueMap {
+    width: 100%;
+
+    height: 350px;
+
+    overflow: hidden;
+
+    background: #f4f6f8;
+
+    border: 1px solid #ccd8e2;
+
+    border-radius: 11px;
+
+    box-shadow:
+            0 5px 16px rgba(15, 23, 42, 0.08);
+}
+
+
+/* =========================================================
+   COMMUNITY SUPPORT
+   ========================================================= */
+
+.support-box {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 17px;
+
+    background: #f6f8fa;
+
+    border: 1px solid #d8e2ea;
+
+    border-radius: 10px;
+
+    transition:
+            background 0.2s ease,
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.support-box:hover {
+    background: #ffffff;
+
+    border-color: #b9cad9;
+
+    box-shadow:
+            0 7px 18px rgba(15, 23, 42, 0.09);
+}
+
+.support-count {
+    color: #465568;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+/* Support button */
+
+.support-button {
+    padding: 10px 17px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #1769aa;
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+            0 3px 8px rgba(23, 105, 170, 0.22);
+
+    transition:
+            background 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.support-button:hover {
+    background: #125a91;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+            0 7px 15px rgba(23, 105, 170, 0.28);
+}
+
+.support-button:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   STATUS TIMELINE
+   ========================================================= */
+
+.timeline {
+    position: relative;
+
+    padding-left: 8px;
+}
+
+.timeline-item {
+    position: relative;
+
+    margin-left: 7px;
+
+    padding:
+            0 0 25px 29px;
+
+    border-left: 2px solid #cfdeea;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+
+    border-left-color: transparent;
+}
+
+
+/* Timeline dot */
+
+.timeline-item::before {
+    content: "";
+
+    position: absolute;
+
+    left: -7px;
+
+    top: 1px;
+
+    width: 11px;
+
+    height: 11px;
+
+    background: #1769aa;
+
+    border: 2px solid #ffffff;
+
+    border-radius: 50%;
+
+    box-shadow:
+            0 0 0 1px #8eb5cf;
+}
+
+
+/* Status */
+
+.timeline-status {
+    margin-bottom: 5px;
+
+    color: #172b4d;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+/* Remarks */
+
+.timeline-remarks {
+    margin-bottom: 6px;
+
+    color: #526273;
+
+    font-size: 12px;
+
+    line-height: 1.65;
+}
+
+
+/* Date */
+
+.timeline-date {
+    color: #7a8998;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   ERROR MESSAGE
+   ========================================================= */
+
+.error-message {
+    padding: 40px 25px;
+
+    text-align: center;
+
+    background: #ffffff;
+
+    border: 1px solid #e0c9c6;
+
+    border-radius: 14px;
+
+    color: #a3312c;
+
+    font-size: 14px;
+
+    box-shadow:
+            0 6px 18px rgba(15, 23, 42, 0.07);
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid rgba(23, 105, 170, 0.30);
+
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .navbar {
+        padding: 15px 5%;
+
+        flex-wrap: wrap;
+    }
+
+    .nav-links {
+        order: 3;
+
+        width: 100%;
+
+        justify-content: center;
+
+        flex-wrap: wrap;
+
+        gap: 17px;
+    }
+
+    .nav-links a {
+        padding: 5px 0;
+    }
+
+    .nav-links a.active::after {
+        bottom: -3px;
+    }
+
+    .profile {
+        margin-left: auto;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .details-container {
+        width: 92%;
+
+        padding-top: 28px;
+    }
+
+    .issue-header {
+        padding: 23px;
+    }
+
+    .issue-header h1 {
+        font-size: 24px;
+    }
+
+    .card {
+        padding: 22px;
+    }
+
+    .card h2 {
+        font-size: 17px;
+    }
+
+    #issueMap {
+        height: 290px;
+    }
+
+    .support-box {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .support-button {
+        width: 100%;
+    }
+
+    .issue-photo,
+    .resolution-photo {
+        max-height: 300px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 450px) {
+
+    .logo {
+        font-size: 22px;
+    }
+
+    .nav-links {
+        gap: 12px;
+    }
+
+    .nav-links a {
+        font-size: 12px;
+    }
+
+    .profile {
+        font-size: 12px;
+    }
+
+    .issue-header h1 {
+        font-size: 21px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+    #issueMap {
+        height: 260px;
+    }
+}

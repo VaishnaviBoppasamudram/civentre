@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Issue Details | Civentre</title>
+
+    <link rel="stylesheet"
+          href="/public-issue-details.css">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+</head>
+
+
+<body>
+
+
+<nav class="navbar">
+
+    <div class="logo">
+        Civentre
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="/">
+            Dashboard
+        </a>
+
+        <a href="/report">
+            Report Issue
+        </a>
+
+        <a href="/my-issues">
+            My Issues
+        </a>
+
+        <a href="/public-issues"
+           class="active">
+            Public Issues
+        </a>
+
+        <a href="/notifications">
+            Notifications
+        </a>
+
+    </div>
+
+
+    <div class="profile">
+        Citizen
+    </div>
+
+</nav>
+<main class="details-container">
+    <div class="back-section">
+
+        <a href="/public-issues">
+            ← Back to Public Issues
+        </a>
+    </div>
+    <section id="issueContainer">
+
+        <p class="loading">
+            Loading issue details...
+        </p>
+
+    </section>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+<script src="/public-issue-details.js">
+</script>
+
+</body>
+
+</html>

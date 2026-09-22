@@ -1,0 +1,957 @@
+/* =========================================================
+   CIVENTRE REPORT ISSUE
+   Unified Professional Design System
+========================================================= */
+
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #F5F7FA;
+    color: #425466;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.navbar {
+    min-height: 72px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 48px;
+
+    background: #123B5D;
+
+    border-bottom: 1px solid #0D314E;
+
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.14);
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    margin-right: 55px;
+
+    color: #FFFFFF;
+
+    font-size: 27px;
+    font-weight: 800;
+
+    letter-spacing: -0.5px;
+}
+
+.navbar nav {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    flex: 1;
+}
+
+.navbar nav a,
+.profile a {
+    position: relative;
+
+    padding: 10px 13px;
+
+    color: #D7E3EE;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    border-radius: 8px;
+
+    transition:
+            background 0.2s ease,
+            color 0.2s ease,
+            transform 0.2s ease;
+}
+
+.navbar nav a:hover,
+.profile a:hover {
+    background: #1B4A6D;
+    color: #FFFFFF;
+}
+
+.navbar nav a[href="/report-issue"] {
+    color: #FFFFFF;
+}
+
+.navbar nav a[href="/report-issue"]::after {
+    content: "";
+
+    position: absolute;
+
+    left: 13px;
+    right: 13px;
+    bottom: 5px;
+
+    height: 2px;
+
+    background: #60A5FA;
+
+    border-radius: 10px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+}
+
+.profile span {
+    padding: 8px 12px;
+
+    background: #1B486B;
+
+    border: 1px solid #315675;
+
+    border-radius: 20px;
+
+    color: #E5EEF6;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.profile a {
+    padding: 8px 10px;
+}
+
+
+/* =========================================================
+   REPORT CONTAINER
+========================================================= */
+
+.report-container {
+    width: 100%;
+    max-width: 850px;
+
+    margin: 0 auto;
+
+    padding: 42px 28px 65px;
+}
+
+
+/* =========================================================
+   REPORT CARD
+========================================================= */
+
+.report-card {
+    padding: 40px;
+
+    background: #FFFFFF;
+
+    border: 1px solid #D9E2EC;
+
+    border-radius: 16px;
+
+    box-shadow:
+            0 7px 24px rgba(15, 23, 42, 0.06);
+
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+}
+
+.report-card:hover {
+    transform: translateY(-3px);
+
+    border-color: #C8D4DF;
+
+    box-shadow:
+            0 12px 30px rgba(15, 23, 42, 0.09);
+}
+
+
+/* =========================================================
+   HEADING
+========================================================= */
+
+.report-card h1 {
+    margin-bottom: 9px;
+
+    color: #172B4D;
+
+    font-size: 31px;
+
+    line-height: 1.2;
+
+    letter-spacing: -0.5px;
+}
+
+.intro {
+    margin-bottom: 32px;
+
+    color: #667085;
+
+    font-size: 15px;
+
+    line-height: 1.65;
+}
+
+
+/* =========================================================
+   FORM GROUP
+========================================================= */
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #344054;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    background: #FFFFFF;
+
+    border: 1px solid #D9E2EC;
+
+    border-radius: 8px;
+
+    color: #172B4D;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #98A2B3;
+}
+
+.form-group input:hover,
+.form-group textarea:hover,
+.form-group select:hover {
+    border-color: #BFCEDB;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #1769AA;
+
+    box-shadow:
+            0 0 0 3px rgba(23, 105, 170, 0.10);
+}
+
+.form-group textarea {
+    min-height: 135px;
+
+    resize: vertical;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   LOCATION BUTTON
+========================================================= */
+
+#locationButton {
+    width: auto;
+
+    margin-top: 11px;
+
+    padding: 10px 15px;
+
+    background: #EAF2F8;
+
+    color: #1769AA;
+
+    border: 1px solid #C9DCE9;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+            background 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+#locationButton:hover {
+    background: #DDECF5;
+
+    border-color: #B6CFDF;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+            0 5px 12px rgba(23, 105, 170, 0.10);
+}
+
+#locationButton:active {
+    transform: translateY(0);
+}
+
+#locationMessage {
+    min-height: 18px;
+
+    margin-top: 8px;
+
+    color: #18864B;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   PHOTO / CAMERA SECTION
+========================================================= */
+
+.form-group:has(#cameraButton) {
+    padding: 22px;
+
+    background: #F8FAFC;
+
+    border: 1px solid #DDE5EC;
+
+    border-radius: 12px;
+}
+
+#cameraButton {
+    width: auto;
+
+    margin-right: 8px;
+    margin-bottom: 12px;
+
+    padding: 10px 15px;
+
+    background: #1769AA;
+
+    color: #FFFFFF;
+
+    border: none;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+            background 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+#cameraButton:hover {
+    background: #125A91;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+            0 6px 14px rgba(18, 90, 145, 0.20);
+}
+
+#cameraButton:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   FILE INPUT
+========================================================= */
+
+#image {
+    display: block;
+
+    width: 100%;
+
+    padding: 10px;
+
+    margin-top: 3px;
+    margin-bottom: 15px;
+
+    background: #FFFFFF;
+
+    border: 1px dashed #C7D4E0;
+
+    border-radius: 8px;
+
+    color: #526071;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition:
+            background 0.2s ease,
+            border-color 0.2s ease;
+}
+
+#image:hover {
+    background: #F8FAFC;
+
+    border-color: #9FB0C1;
+}
+
+#image::file-selector-button {
+    margin-right: 10px;
+
+    padding: 8px 12px;
+
+    background: #EAF2F8;
+
+    color: #1769AA;
+
+    border: none;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   CAMERA PREVIEW
+========================================================= */
+
+#cameraPreview {
+    display: none;
+
+    width: 100%;
+
+    max-height: 400px;
+
+    margin-top: 10px;
+    margin-bottom: 12px;
+
+    object-fit: cover;
+
+    background: #172B4D;
+
+    border: 1px solid #D9E2EC;
+
+    border-radius: 11px;
+
+    box-shadow:
+            0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+#photoCanvas {
+    display: none;
+}
+
+
+/* =========================================================
+   CAPTURED PHOTO
+========================================================= */
+
+#photoPreview {
+    display: none;
+
+    width: 100%;
+
+    max-height: 420px;
+
+    object-fit: contain;
+
+    margin-top: 10px;
+
+    padding: 8px;
+
+    background: #F8FAFC;
+
+    border: 1px solid #D9E2EC;
+
+    border-radius: 11px;
+
+    box-shadow:
+            0 5px 15px rgba(15, 23, 42, 0.06);
+}
+
+
+/* =========================================================
+   CAMERA BUTTONS
+========================================================= */
+
+#captureButton,
+#retakeButton {
+    display: none;
+
+    width: auto;
+
+    margin-right: 8px;
+
+    margin-top: 2px;
+
+    padding: 10px 15px;
+
+    color: #FFFFFF;
+
+    border: none;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+            background 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+#captureButton {
+    background: #1769AA;
+}
+
+#captureButton:hover {
+    background: #125A91;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+            0 6px 14px rgba(18, 90, 145, 0.18);
+}
+
+#retakeButton {
+    background: #667085;
+}
+
+#retakeButton:hover {
+    background: #475467;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+            0 6px 14px rgba(71, 84, 103, 0.16);
+}
+
+#cameraMessage {
+    min-height: 18px;
+
+    margin-top: 5px;
+
+    color: #667085;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   DUPLICATE ISSUE SECTION
+========================================================= */
+
+.duplicate-section {
+    margin-top: 25px;
+    margin-bottom: 25px;
+
+    padding: 22px;
+
+    background: #FFFAF0;
+
+    border: 1px solid #F0D9A6;
+
+    border-left: 4px solid #B54708;
+
+    border-radius: 12px;
+}
+
+.duplicate-section h3 {
+    margin-bottom: 8px;
+
+    color: #7A4B08;
+
+    font-size: 17px;
+}
+
+.duplicate-section > p {
+    margin-bottom: 16px;
+
+    color: #75633F;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+#duplicateList {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+
+/* =========================================================
+   DUPLICATE CARD
+========================================================= */
+
+.duplicate-card {
+    padding: 17px;
+
+    background: #FFFFFF;
+
+    border: 1px solid #E9DFC9;
+
+    border-radius: 10px;
+
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+}
+
+.duplicate-card:hover {
+    transform: translateY(-3px);
+
+    border-color: #DCCBA8;
+
+    box-shadow:
+            0 7px 18px rgba(70, 50, 20, 0.08);
+}
+
+.duplicate-card h4 {
+    margin-bottom: 9px;
+
+    color: #172B4D;
+
+    font-size: 15px;
+
+    line-height: 1.4;
+}
+
+.duplicate-card p {
+    margin-bottom: 5px;
+
+    color: #667085;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+.duplicate-card strong {
+    color: #344054;
+}
+
+
+/* =========================================================
+   DUPLICATE VIEW BUTTON
+========================================================= */
+
+.duplicate-view-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 10px;
+
+    padding: 8px 13px;
+
+    background: #1769AA;
+
+    color: #FFFFFF;
+
+    text-decoration: none;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    transition:
+            background 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.duplicate-view-button:hover {
+    background: #125A91;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+            0 5px 12px rgba(18, 90, 145, 0.16);
+}
+
+
+/* =========================================================
+   SUBMIT BUTTON
+========================================================= */
+
+#issueForm > button[type="submit"] {
+    width: 100%;
+
+    padding: 14px 18px;
+
+    margin-top: 5px;
+
+    background: #1769AA;
+
+    color: #FFFFFF;
+
+    border: none;
+
+    border-radius: 9px;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+            0 5px 14px rgba(23, 105, 170, 0.18);
+
+    transition:
+            background 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+#issueForm > button[type="submit"]:hover {
+    background: #125A91;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+            0 9px 20px rgba(18, 90, 145, 0.22);
+}
+
+#issueForm > button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+#message {
+    min-height: 20px;
+
+    margin-top: 18px;
+
+    padding: 0;
+
+    text-align: center;
+
+    color: #667085;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    line-height: 1.5;
+}
+
+#message.error-message {
+    padding: 12px 15px;
+
+    background: #FFF0F0;
+
+    color: #B42318;
+
+    border: 1px solid #FECACA;
+
+    border-radius: 9px;
+}
+
+#message.success-message {
+    padding: 12px 15px;
+
+    background: #EAF7EF;
+
+    color: #18864B;
+
+    border: 1px solid #B7E2C5;
+
+    border-radius: 9px;
+}
+
+
+/* =========================================================
+   RESPONSIVE - 850px
+========================================================= */
+
+@media (max-width: 850px) {
+
+    .navbar {
+        padding: 15px 20px;
+
+        flex-wrap: wrap;
+
+        gap: 10px;
+    }
+
+    .logo {
+        margin-right: auto;
+    }
+
+    .navbar nav {
+        order: 3;
+
+        width: 100%;
+
+        gap: 4px;
+
+        overflow-x: auto;
+
+        padding-bottom: 2px;
+    }
+
+    .navbar nav a,
+    .profile a {
+        padding: 9px 10px;
+
+        white-space: nowrap;
+    }
+
+    .navbar nav a[href="/report-issue"]::after {
+        left: 10px;
+        right: 10px;
+        bottom: 2px;
+    }
+
+    .report-container {
+        padding: 30px 20px 45px;
+    }
+
+    .report-card {
+        padding: 28px 24px;
+
+        border-radius: 14px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - 550px
+========================================================= */
+
+@media (max-width: 550px) {
+
+    .report-container {
+        padding: 20px 13px 35px;
+    }
+
+    .report-card {
+        padding: 23px 18px;
+
+        border-radius: 13px;
+    }
+
+    .report-card h1 {
+        font-size: 26px;
+    }
+
+    .intro {
+        font-size: 14px;
+
+        margin-bottom: 25px;
+    }
+
+    #locationButton {
+        width: 100%;
+    }
+
+    #cameraButton {
+        width: 100%;
+
+        margin-right: 0;
+    }
+
+    #image {
+        font-size: 12px;
+    }
+
+    #captureButton,
+    #retakeButton {
+        width: 100%;
+
+        margin-right: 0;
+
+        margin-top: 8px;
+    }
+
+    .form-group:has(#cameraButton) {
+        padding: 17px;
+    }
+
+    #cameraPreview,
+    #photoPreview {
+        max-height: 300px;
+    }
+
+    .duplicate-section {
+        padding: 17px;
+    }
+
+    .duplicate-card {
+        padding: 15px;
+    }
+}

@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Civentre Admin Dashboard</title>
+
+    <link rel="stylesheet"
+          href="/admin.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+<header class="admin-header">
+
+    <div>
+
+        <h1>Civentre Admin Dashboard</h1>
+
+        <p>Manage and monitor public issues</p>
+    </div>
+    <form action="/logout"
+          method="post"
+          style="display: inline;">
+        <input type="hidden"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}">
+
+        <button type="submit"
+                class="logout-btn">
+
+            Logout
+        </button>
+    </form>
+</header>
+<main class="container">
+    <!-- ==============================
+         Statistics
+         ============================== -->
+
+    <section class="stats">
+        <div class="stat-card">
+            <h3>Total Issues</h3>
+            <p id="totalIssues">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Reported</h3>
+            <p id="reportedIssues">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>In Progress</h3>
+            <p id="progressIssues">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Resolved</h3>
+            <p id="resolvedIssues">0</p>
+        </div>
+        <div class="stat-card">
+
+            <h3>Closed</h3>
+
+            <p id="closedIssues">0</p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>Rejected</h3>
+
+            <p id="rejectedIssues">0</p>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ==============================
+         Analytics
+         ============================== -->
+
+    <section class="analytics-section">
+
+        <div class="analytics-header">
+
+            <h2>Analytics Overview</h2>
+
+            <p>
+                Monitor issue distribution across categories,
+                priorities, statuses, and departments.
+            </p>
+
+        </div>
+
+
+        <div class="analytics-grid">
+
+
+            <div class="analytics-card">
+
+                <h3>Issues by Category</h3>
+
+                <canvas id="categoryChart"></canvas>
+
+            </div>
+
+
+            <div class="analytics-card">
+
+                <h3>Issues by Priority</h3>
+
+                <canvas id="priorityChart"></canvas>
+
+            </div>
+
+
+            <div class="analytics-card">
+
+                <h3>Issues by Status</h3>
+
+                <canvas id="statusChart"></canvas>
+
+            </div>
+
+
+            <div class="analytics-card">
+
+                <h3>Issues by Department</h3>
+
+                <canvas id="departmentChart"></canvas>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==============================
+         Officer Workload
+         ============================== -->
+
+    <section class="workload-section">
+
+        <div class="workload-header">
+
+            <h2>Officer Workload</h2>
+
+            <p>
+                Monitor issue assignments and workload across field officers.
+            </p>
+
+        </div>
+
+
+        <div id="officerWorkload"
+             class="workload-grid">
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==============================
+         All Public Issues
+         ============================== -->
+
+    <section class="issues-section">
+
+
+        <h2>All Public Issues</h2>
+
+
+
+        <!-- ==============================
+             Status Filter
+             ============================== -->
+
+        <div class="filter-section">
+
+            <label for="statusFilter">
+                Filter by Status:
+            </label>
+
+
+            <select id="statusFilter"
+                    onchange="filterIssues()">
+
+                <option value="ALL">
+                    All Issues
+                </option>
+
+                <option value="REPORTED">
+                    Reported
+                </option>
+
+                <option value="VERIFIED">
+                    Verified
+                </option>
+
+                <option value="ASSIGNED">
+                    Assigned
+                </option>
+
+                <option value="IN_PROGRESS">
+                    In Progress
+                </option>
+
+                <option value="RESOLVED">
+                    Resolved
+                </option>
+
+                <option value="CLOSED">
+                    Closed
+                </option>
+
+                <option value="REJECTED">
+                    Rejected
+                </option>
+
+            </select>
+
+        </div>
+
+
+
+        <div class="table-container">
+
+
+            <table>
+
+
+                <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Title</th>
+
+                    <th>Category</th>
+
+                    <th>Department</th>
+
+                    <th>Officer</th>
+
+                    <th>Location</th>
+
+                    <th>Status</th>
+
+                    <th>Priority</th>
+
+                    <th>Reported Date</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody id="issuesTable">
+
+                </tbody>
+
+
+            </table>
+
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+
+<script>
+
+    function getCsrfToken() {
+
+        const cookie = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("XSRF-TOKEN="));
+
+        return cookie
+            ? decodeURIComponent(cookie.split("=")[1])
+            : null;
+    }
+
+
+    // ==============================
+    // Load Departments
+    // ==============================
+
+    async function loadDepartments() {
+
+        try {
+
+            const response =
+                await fetch("/api/admin/departments");
+
+
+            if (!response.ok) {
+
+                alert("Unable to load departments.");
+
+                return [];
+
+            }
+
+
+            return await response.json();
+
+        } catch (error) {
+
+            console.error(
+                "Department loading error:",
+                error
+            );
+
+            alert(
+                "Unable to connect to the server while loading departments."
+            );
+
+            return [];
+
+        }
+
+    }
+
+
+
+    // ==============================
+    // Load Officers By Department
+    // ==============================
+
+    async function loadOfficersByDepartment(
+        issueId,
+        departmentId,
+        selectedOfficerId = null
+    ) {
+
+        const officerSelect =
+            document.getElementById(
+                `officer-${issueId}`
+            );
+
+
+        if (!officerSelect) {
+
+            return;
+
+        }
+
+
+        // Always clear the dropdown first
+
+        officerSelect.innerHTML = "";
+
+
+        // ==============================
+        // No Department Selected
+        // ==============================
+
+        if (!departmentId) {
+
+            const option =
+                document.createElement("option");
+
+
+            option.value = "";
+
+
+            option.textContent =
+                "Select department first";
+
+
+            officerSelect.appendChild(
+                option
+            );
+
+
+            // Explicitly select empty value
+
+            officerSelect.value = "";
+
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `/api/admin/officers-by-department?departmentId=${departmentId}`
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to load department officers"
+                );
+
+            }
+
+
+            const officers =
+                await response.json();
+
+
+
+            // ==============================
+            // Default Officer Option
+            // ==============================
+
+            const defaultOption =
+                document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.textContent =
+                "Select Officer";
+            officerSelect.appendChild(
+                defaultOption
+            );
+            // ==============================
+            // No Officers Available
+            // ==============================
+
+            if (officers.length === 0) {
+
+                defaultOption.textContent =
+                    "No officers available";
+
+
+                officerSelect.value = "";
+
+
+                return;
+
+            }
+
+
+
+            // ==============================
+            // Add Officers
+            // ==============================
+
+            officers.forEach(
+                officer => {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+                    option.value =
+                        String(officer.id);
+                    option.textContent = officer.name;
+                    officerSelect.appendChild(
+                        option
+                    );
+                }
+            );
+            // ==============================
+            // IMPORTANT FIX
+            // ==============================
+
+            /*
+             * If the issue already has an officer,
+             * select that exact officer.
+             *
+             * If the issue has NO officer,
+             * explicitly select the blank option.
+             */
+
+            if (
+                selectedOfficerId !== null &&
+                selectedOfficerId !== undefined &&
+                selectedOfficerId !== ""
+            ) {
+                const officerValue =
+                    String(selectedOfficerId);
+                const officerExists =
+                    Array.from(
+                        officerSelect.options
+                    ).some(
+                        option =>
+                            option.value === officerValue
+                    );
+                if (officerExists) {
+                    officerSelect.value =
+                        officerValue;
+                } else {
+                    // Officer does not belong
+                    // to this department
+                    officerSelect.value = "";
+                }
+            } else {
+
+                // No officer assigned
+
+                officerSelect.value = "";
+
+            }
+
+
+
+        } catch (error) {
+
+            console.error(
+                "Department officer loading error:",
+                error
+            );
+
+
+            officerSelect.innerHTML = "";
+
+
+            const option =
+                document.createElement("option");
+
+
+            option.value = "";
+
+
+            option.textContent =
+                "Unable to load officers";
+
+
+            officerSelect.appendChild(
+                option
+            );
+
+
+            officerSelect.value = "";
+
+        }
+
+    }
+
+
+
+    // ==============================
+    // Load Issues
+    // ==============================
+
+    async function loadIssues() {
+
+        try {
+
+
+            // ==============================
+            // Load Departments
+            // ==============================
+
+            const departments =
+                await loadDepartments();
+
+
+
+            // ==============================
+            // Load Issues
+            // ==============================
+
+            const response =
+                await fetch("/api/admin/issues");
+
+
+            if (!response.ok) {
+
+                alert("Unable to load issues.");
+
+                return;
+
+            }
+
+
+            const issues =
+                await response.json();
+
+
+
+            // ==============================
+            // Statistics
+            // ==============================
+
+            const statsResponse =
+                await fetch("/api/admin/stats");
+
+
+            if (!statsResponse.ok) {
+
+                throw new Error(
+                    "Unable to load admin statistics"
+                );
+
+            }
+
+
+            const stats =
+                await statsResponse.json();
+
+
+
+            document.getElementById(
+                "totalIssues"
+            ).textContent =
+                stats.total;
+
+
+            document.getElementById(
+                "reportedIssues"
+            ).textContent =
+                stats.reported;
+
+
+            document.getElementById(
+                "progressIssues"
+            ).textContent =
+                stats.inProgress;
+
+
+            document.getElementById(
+                "resolvedIssues"
+            ).textContent =
+                stats.resolved;
+
+
+            document.getElementById(
+                "closedIssues"
+            ).textContent =
+                stats.closed;
+
+
+            document.getElementById(
+                "rejectedIssues"
+            ).textContent =
+                stats.rejected;
+
+
+
+            // ==============================
+            // Table
+            // ==============================
+
+            const table =
+                document.getElementById(
+                    "issuesTable"
+                );
+
+
+            table.innerHTML = "";
+
+
+
+            const selectedStatus =
+                document.getElementById(
+                    "statusFilter"
+                ).value;
+
+
+
+            const filteredIssues =
+                selectedStatus === "ALL"
+                    ? issues
+                    : issues.filter(
+                        issue =>
+                            issue.status === selectedStatus
+                    );
+
+
+
+            // ==============================
+            // Create Issue Rows
+            // ==============================
+
+            filteredIssues.forEach(issue => {
+
+
+                const row =
+                    document.createElement("tr");
+
+
+
+                row.innerHTML = `
+
+                    <td>
+                        #${issue.id}
+                    </td>
+
+
+                    <td>
+                        ${issue.title}
+                    </td>
+
+
+                    <td>
+                        ${issue.category}
+                    </td>
+
+
+                    <!-- Department -->
+
+                    <td>
+
+                        <select
+                            id="department-${issue.id}"
+                            class="department-select"
+                            onchange="loadOfficersByDepartment(${issue.id}, this.value)">
+
+                            <option value="">
+                                Select Department
+                            </option>
+
+                        </select>
+
+
+                        <button
+                            class="assign-btn"
+                            onclick="assignDepartment(${issue.id})">
+
+                            Assign
+
+                        </button>
+
+                    </td>
+
+
+                    <!-- Officer -->
+
+                    <td>
+
+                        <select
+                            id="officer-${issue.id}"
+                            class="officer-select">
+
+                            <option value="">
+                                Select Department First
+                            </option>
+
+                        </select>
+
+
+                        <button
+                            class="assign-btn"
+                            onclick="assignOfficer(${issue.id})">
+
+                            Assign
+
+                        </button>
+
+                    </td>
+
+
+                    <!-- Location -->
+
+                    <td>
+                        ${issue.location || "-"}
+                    </td>
+
+
+                    <!-- Status -->
+
+                    <td>
+
+                        <span
+                            class="status ${issue.status.toLowerCase()}">
+
+                            ${issue.status}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- Priority -->
+
+                    <td>
+
+                        <span
+                            class="priority-badge priority-${(
+                    issue.priority || "MEDIUM"
+                ).toLowerCase()}">
+
+                            ${issue.priority || "MEDIUM"}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- Reported Date -->
+
+                    <td>
+
+                        ${
+                    issue.createdAt
+                        ? new Date(
+                            issue.createdAt
+                        ).toLocaleDateString()
+                        : "-"
+                }
+
+                    </td>
+
+
+                    <!-- Actions -->
+
+                    <td>
+
+                        <button
+                            class="details-btn"
+                            onclick="viewIssue(${issue.id})">
+
+                            View Details
+
+                        </button>
+
+
+                        <select
+                            id="status-${issue.id}">
+
+
+                            <option
+                                value="REPORTED"
+                                ${
+                    issue.status === "REPORTED"
+                        ? "selected"
+                        : ""
+                }>
+
+                                REPORTED
+
+                            </option>
+
+
+                            <option
+                                value="VERIFIED"
+                                ${
+                    issue.status === "VERIFIED"
+                        ? "selected"
+                        : ""
+                }>
+
+                                VERIFIED
+
+                            </option>
+
+
+                            <option
+                                value="ASSIGNED"
+                                ${
+                    issue.status === "ASSIGNED"
+                        ? "selected"
+                        : ""
+                }>
+
+                                ASSIGNED
+
+                            </option>
+
+
+                            <option
+                                value="IN_PROGRESS"
+                                ${
+                    issue.status === "IN_PROGRESS"
+                        ? "selected"
+                        : ""
+                }>
+
+                                IN PROGRESS
+
+                            </option>
+
+
+                            <option
+                                value="RESOLVED"
+                                ${
+                    issue.status === "RESOLVED"
+                        ? "selected"
+                        : ""
+                }>
+                                RESOLVED
+                            </option>
+                            <option
+                                value="CLOSED"
+                                ${
+                    issue.status === "CLOSED"
+                        ? "selected"
+                        : ""
+                }>
+
+                                CLOSED
+                            </option>
+                            <option
+                                value="REJECTED"
+                                ${
+                    issue.status === "REJECTED"
+                        ? "selected"
+                        : ""
+                }>
+                                REJECTED
+                            </option>
+                        </select>
+                        <button
+                            onclick="updateStatus(${issue.id})">
+
+                            Update
+
+                        </button>
+
+                    </td>
+
+                `;
+                table.appendChild(row);
+                // ==============================
+                // Populate Department Dropdown
+                // ==============================
+
+                const departmentSelect =
+                    document.getElementById(
+                        `department-${issue.id}`
+                    );
+                departments.forEach(
+                    department => {
+                        const option =
+                            document.createElement(
+                                "option"
+                            );
+                        option.value =
+                            String(department.id);
+                        option.textContent =
+                            department.name;
+                        // Select current department
+                        if (
+                            issue.departmentId &&
+                            String(issue.departmentId) ===
+                            String(department.id)
+                        ) {
+                            option.selected = true;
+                        }
+                        departmentSelect.appendChild(
+                            option
+                        );
+                    }
+                );
+                // ==============================
+                // Get Current Department
+                // ==============================
+
+                const currentDepartmentId =
+                    issue.departmentId
+                        ? issue.departmentId
+                        : null;
+
+                // ==============================
+                // Get Current Officer
+                // ==============================
+                const currentOfficerId =
+                    issue.officerId
+                        ? issue.officerId
+                        : null;
+                // ==============================
+                // Load Officers
+                // ==============================
+                if (currentDepartmentId) {
+                    loadOfficersByDepartment(
+                        issue.id,
+                        currentDepartmentId,
+                        currentOfficerId
+                    );
+                } else {
+                    const officerSelect =
+                        document.getElementById(
+                            `officer-${issue.id}`
+                        );
+                    if (officerSelect) {
+                        officerSelect.innerHTML = "";
+                        const option =
+                            document.createElement(
+                                "option"
+                            );
+                        option.value = "";
+                        option.textContent =
+                            "Select department first";
+
+
+                        officerSelect.appendChild(
+                            option
+                        );
+
+
+                        officerSelect.value = "";
+
+                    }
+
+                }
+
+            });
+        } catch (error) {
+            console.error(
+                "Issue loading error:",
+                error
+            );
+            alert(
+                "Something went wrong while loading the admin dashboard."
+            );
+        }
+    }
+    // ==============================
+    // View Issue Details
+    // ==============================
+    function viewIssue(issueId) {
+        window.location.href =
+            `/admin/issues/${issueId}`;
+    }
+    // =============================
+    // Filter Issues
+    // ==============================
+    function filterIssues() {
+
+        loadIssues();
+
+    }
+
+
+
+    // ==============================
+    // Assign Department
+    // ==============================
+
+    async function assignDepartment(issueId) {
+
+
+        const departmentSelect =
+            document.getElementById(
+                `department-${issueId}`
+            );
+        const departmentId =
+            departmentSelect.value;
+        if (!departmentId) {
+            alert(
+                "Please select a department."
+            );
+            return;
+        }
+        try {
+            const response =
+                await fetch(
+                    `/api/admin/issues/${issueId}/department?departmentId=${departmentId}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "X-XSRF-TOKEN": getCsrfToken()
+                        }
+                    }
+                );
+            if (response.ok) {
+                alert(
+                    "Department assigned successfully!"
+                );
+                await loadIssues();
+            } else {
+                alert(
+                    "Failed to assign department."
+                );
+            }
+        } catch (error) {
+            console.error(
+                "Department assignment error:",
+                error
+            );
+            alert(
+                "Unable to assign department."
+            );
+        }
+    }
+    // ==============================
+    // Assign Officer
+    // ==============================
+    async function assignOfficer(issueId) {
+        const officerSelect =
+            document.getElementById(
+                `officer-${issueId}`
+            );
+        const officerId =
+            officerSelect.value;
+        if (!officerId) {
+            alert(
+                "Please select an officer."
+            );
+            return;
+        }
+        try {
+            const response =
+                await fetch(
+                    `/api/admin/issues/${issueId}/officer?officerId=${officerId}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "X-XSRF-TOKEN": getCsrfToken()
+                        }
+                    }
+                );
+            if (response.ok) {
+                alert(
+                    "Officer assigned successfully!"
+                );
+                await loadIssues();
+            } else {
+                alert(
+                    "Failed to assign officer."
+                );
+            }
+        } catch (error) {
+            console.error(
+                "Officer assignment error:",
+                error
+            );
+            alert(
+                "Unable to assign officer."
+            );
+        }
+    }
+    // ==============================
+    // Update Issue Status
+    // ==============================
+    async function updateStatus(issueId) {
+        const statusSelect =
+            document.getElementById(
+                `status-${issueId}`
+            );
+        const status =
+            statusSelect.value;
+        const remarks =
+            prompt(
+                "Enter remarks for this status update:"
+            );
+        if (remarks === null) {
+            return;
+        }
+        try {
+            const response =
+                await fetch(
+                    `/api/admin/issues/${issueId}/status?status=${status}&remarks=${encodeURIComponent(remarks)}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "X-XSRF-TOKEN": getCsrfToken()
+                        }
+                    }
+                );
+            if (response.ok) {
+                alert(
+                    "Issue status updated successfully!"
+                );
+                await loadIssues();
+            } else {
+                alert(
+                    "Failed to update issue status."
+                );
+            }
+        } catch (error) {
+            console.error(
+                "Status update error:",
+                error
+            );
+            alert(
+                "Unable to update issue status."
+            );
+        }
+
+    }
+    // ==============================
+    // Category Chart
+    // ==============================
+
+    let categoryChart;
+    async function loadCategoryChart() {
+        const response =
+            await fetch(
+                "/api/admin/analytics/category"
+            );
+
+
+        const data =
+            await response.json();
+
+
+        const labels =
+            Object.keys(data);
+
+
+        const values =
+            Object.values(data);
+
+
+        const ctx =
+            document.getElementById(
+                "categoryChart"
+            );
+
+
+        if (categoryChart) {
+
+            categoryChart.destroy();
+
+        }
+
+
+        categoryChart =
+            new Chart(
+                ctx,
+                {
+
+                    type: "bar",
+
+                    data: {
+
+                        labels: labels,
+
+                        datasets: [{
+                            label: "Number of Issues",
+                            data: values
+                        }]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        plugins: {
+
+                            legend: {
+                                display: false
+                            }
+
+                        },
+
+                        scales: {
+
+                            y: {
+
+                                beginAtZero: true,
+
+                                ticks: {
+                                    precision: 0,
+                                    stepSize: 1
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+    }
+
+
+
+    // ==============================
+    // Priority Chart
+    // ==============================
+
+    let priorityChart;
+
+
+    async function loadPriorityChart() {
+
+
+        const response =
+            await fetch(
+                "/api/admin/analytics/priority"
+            );
+
+
+        const data =
+            await response.json();
+
+
+        const labels =
+            Object.keys(data);
+
+
+        const values =
+            Object.values(data);
+
+
+        const ctx =
+            document.getElementById(
+                "priorityChart"
+            );
+
+
+        if (priorityChart) {
+
+            priorityChart.destroy();
+
+        }
+
+
+        priorityChart =
+            new Chart(
+                ctx,
+                {
+
+                    type: "bar",
+
+                    data: {
+
+                        labels: labels,
+
+                        datasets: [{
+                            label: "Number of Issues",
+                            data: values
+                        }]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        layout: {
+                            padding: 5
+                        },
+
+                        plugins: {
+
+                            legend: {
+                                display: false
+                            }
+
+                        },
+
+                        scales: {
+
+                            y: {
+
+                                beginAtZero: true,
+
+                                ticks: {
+                                    precision: 0,
+                                    stepSize: 1
+                                }
+
+                            },
+
+                            x: {
+
+                                ticks: {
+                                    maxRotation: 0
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+    }
+
+
+
+    // ==============================
+    // Status Chart
+    // ==============================
+
+    let statusChart;
+
+
+    async function loadStatusChart() {
+
+
+        const response =
+            await fetch(
+                "/api/admin/analytics/status"
+            );
+
+
+        const data =
+            await response.json();
+
+
+        const labels =
+            Object.keys(data);
+
+
+        const values =
+            Object.values(data);
+
+
+        const ctx =
+            document.getElementById(
+                "statusChart"
+            );
+
+
+        if (statusChart) {
+
+            statusChart.destroy();
+
+        }
+
+
+        statusChart =
+            new Chart(
+                ctx,
+                {
+
+                    type: "bar",
+
+                    data: {
+
+                        labels: labels,
+
+                        datasets: [{
+                            label: "Number of Issues",
+                            data: values
+                        }]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        layout: {
+                            padding: 5
+                        },
+
+                        plugins: {
+
+                            legend: {
+                                display: false
+                            }
+
+                        },
+
+                        scales: {
+
+                            y: {
+
+                                beginAtZero: true,
+
+                                ticks: {
+                                    precision: 0,
+                                    stepSize: 1
+                                }
+
+                            },
+
+                            x: {
+
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 0
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+    }
+
+
+
+    // ==============================
+    // Department Chart
+    // ==============================
+
+    let departmentChart;
+
+
+    async function loadDepartmentChart() {
+
+
+        const response =
+            await fetch(
+                "/api/admin/analytics/department"
+            );
+
+
+        const data =
+            await response.json();
+
+
+        const labels =
+            Object.keys(data);
+
+
+        const values =
+            Object.values(data);
+
+
+        const ctx =
+            document.getElementById(
+                "departmentChart"
+            );
+
+
+        if (departmentChart) {
+
+            departmentChart.destroy();
+
+        }
+
+
+        departmentChart =
+            new Chart(
+                ctx,
+                {
+
+                    type: "bar",
+
+                    data: {
+
+                        labels: labels,
+
+                        datasets: [{
+                            label: "Number of Issues",
+                            data: values
+                        }]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        layout: {
+                            padding: 5
+                        },
+
+                        plugins: {
+
+                            legend: {
+                                display: false
+                            }
+
+                        },
+
+                        scales: {
+
+                            y: {
+
+                                beginAtZero: true,
+
+                                ticks: {
+                                    precision: 0,
+                                    stepSize: 1
+                                }
+
+                            },
+
+                            x: {
+
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 0
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+    }
+
+
+
+    // ==============================
+    // Officer Workload
+    // ==============================
+
+    async function loadOfficerWorkload() {
+
+
+        try {
+
+
+            const response =
+                await fetch(
+                    "/api/admin/officer-workload"
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to load officer workload"
+                );
+
+            }
+
+
+            const officers =
+                await response.json();
+
+
+            const container =
+                document.getElementById(
+                    "officerWorkload"
+                );
+
+
+            container.innerHTML = "";
+
+
+            officers.forEach(
+                officer => {
+
+
+                    const card =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    card.className =
+                        "workload-card";
+
+
+                    card.innerHTML = `
+
+                        <h3>
+                            ${officer.name}
+                        </h3>
+
+
+                        <div class="workload-stats">
+
+
+                            <div>
+
+                                <span>
+                                    Total
+                                </span>
+
+                                <strong>
+                                    ${officer.total}
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    Assigned
+                                </span>
+
+                                <strong>
+                                    ${officer.assigned}
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    In Progress
+                                </span>
+
+                                <strong>
+                                    ${officer.inProgress}
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    Resolved
+                                </span>
+
+                                <strong>
+                                    ${officer.resolved}
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+                    `;
+
+
+                    container.appendChild(
+                        card
+                    );
+
+                }
+            );
+
+
+        } catch (error) {
+
+
+            console.error(
+                "Officer workload error:",
+                error
+            );
+
+        }
+
+    }
+
+
+
+    // ==============================
+    // Initial Load
+    // ==============================
+
+    loadIssues();
+
+    loadCategoryChart();
+
+    loadPriorityChart();
+
+    loadStatusChart();
+
+    loadDepartmentChart();
+
+    loadOfficerWorkload();
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Civentre - Dashboard</title>
+
+    <link rel="stylesheet" href="/dashboard.css">
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        Civentre
+    </div>
+
+    <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/report-issue">Report Issue</a>
+        <a href="/my-issues">My Issues</a>
+        <a href="/notifications">Notifications</a>
+    </nav>
+
+    <div class="profile">
+        <span>Citizen</span>
+        <form action="/logout"
+              method="post"
+              style="display: inline;">
+
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
+
+            <button type="submit"
+                    class="logout">
+
+                Logout
+
+            </button>
+
+        </form>
+    </div>
+
+</header>
+
+
+<main class="dashboard-container">
+
+    <section class="welcome-section">
+
+        <div class="welcome-content">
+
+            <span class="welcome-label">CITIZEN DASHBOARD</span>
+
+            <h1>Welcome to Civentre 👋</h1>
+
+            <p>
+                Report public issues, track their progress,
+                and help make your community better.
+            </p>
+
+        </div>
+
+        <a href="/report-issue" class="welcome-button">
+            + Report an Issue
+        </a>
+
+    </section>
+
+
+    <section class="quick-actions">
+
+        <div class="action-card">
+            <h2>Report an Issue</h2>
+
+            <p>
+                Report potholes, garbage, broken streetlights,
+                water leaks and other public issues.
+            </p>
+
+            <a href="/report-issue">Report Issue</a>
+        </div>
+
+
+        <div class="action-card">
+            <h2>Track My Issues</h2>
+
+            <p>
+                Check the current status and progress
+                of issues you have reported.
+            </p>
+
+            <a href="/my-issues">View My Issues</a>
+        </div>
+
+
+        <div class="action-card">
+            <h2>Notifications</h2>
+
+            <p>
+                Stay updated when there is progress
+                on your reported issues.
+            </p>
+
+            <a href="/notifications">View Notifications</a>
+        </div>
+
+    </section>
+
+
+    <section class="stats-section">
+
+        <div class="stat-card">
+            <h3 id="totalIssues">0</h3>
+            <p>Issues Reported</p>
+        </div>
+
+        <div class="stat-card">
+            <h3 id="inProgressIssues">0</h3>
+            <p>In Progress</p>
+        </div>
+
+        <div class="stat-card">
+            <h3 id="resolvedIssues">0</h3>
+            <p>Resolved</p>
+        </div>
+
+        <div class="stat-card">
+            <h3 id="unreadNotifications">0</h3>
+            <p>Unread Notifications</p>
+        </div>
+
+    </section>
+
+    <section class="recent-issues-section">
+
+        <div class="section-heading">
+            <div>
+                <span class="section-label">ACTIVITY</span>
+                <h2>Recent Issues</h2>
+            </div>
+
+            <a href="/my-issues">View All →</a>
+        </div>
+
+        <div id="recentIssuesList" class="recent-issues-list">
+            <p class="loading-text">Loading your recent issues...</p>
+        </div>
+
+    </section>
+    <section class="info-section">
+
+        <h2>How Civentre Works</h2>
+
+        <div class="steps">
+
+            <div>
+                <strong>1. Report</strong>
+                <p>Submit a public issue with details and location.</p>
+            </div>
+
+            <div>
+                <strong>2. Track</strong>
+                <p>Follow the progress of your reported issue.</p>
+            </div>
+
+            <div>
+                <strong>3. Resolve</strong>
+                <p>Authorities work on the issue and update its status.</p>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+<script>
+    async function loadDashboardStats() {
+
+        const response = await fetch("/api/issues/stats");
+
+        const stats = await response.json();
+
+        document.getElementById("totalIssues").textContent = stats.total;
+        document.getElementById("inProgressIssues").textContent = stats.inProgress;
+        document.getElementById("resolvedIssues").textContent = stats.resolved;
+
+
+        const notificationResponse =
+            await fetch("/api/notifications/unread-count");
+
+        const notificationData =
+            await notificationResponse.json();
+
+        document.getElementById("unreadNotifications").textContent =
+            notificationData.count;
+    }
+
+    loadDashboardStats();
+    async function loadRecentIssues() {
+
+        const response = await fetch("/api/issues/my");
+
+        const list = document.getElementById("recentIssuesList");
+
+        if (!response.ok) {
+            list.innerHTML =
+                "<p class='loading-text'>Unable to load recent issues.</p>";
+            return;
+        }
+
+        const issues = await response.json();
+
+        if (issues.length === 0) {
+            list.innerHTML =
+                "<p class='loading-text'>You have not reported any issues yet.</p>";
+            return;
+        }
+
+        const recentIssues = issues.slice(-3).reverse();
+
+        list.innerHTML = "";
+        recentIssues.forEach(issue => {
+
+            const card = document.createElement("div");
+
+            card.className = "recent-issue-card";
+
+            card.innerHTML = `
+        <div class="recent-issue-info">
+
+            <h3>${issue.title}</h3>
+
+            <p>${issue.category}</p>
+
+            <span>
+                Reported:
+                ${new Date(issue.createdAt).toLocaleDateString()}
+            </span>
+        </div>
+        <div class="recent-issue-status">
+            ${issue.status}
+        </div>
+        <div class="recent-issue-arrow">
+        </div>
+    `;
+            card.addEventListener("click", () => {
+
+                window.location.href =
+                    `/my-issues?issueId=${issue.id}`;
+            });
+
+            list.appendChild(card);
+        });
+
+
+    }
+
+    loadRecentIssues();
+</script>
+
+</body>
+</html>

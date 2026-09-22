@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Public Issues | Civentre</title>
+
+    <link rel="stylesheet" href="/public-issues.css">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="logo">
+        Civentre
+    </div>
+
+    <div class="nav-links">
+        <a href="/">Dashboard</a>
+        <a href="/report">Report Issue</a>
+        <a href="/my-issues">My Issues</a>
+        <a href="/public-issues" class="active">Public Issues</a>
+        <a href="/notifications">Notifications</a>
+    </div>
+
+    <div class="profile">
+        Citizen
+    </div>
+
+</nav>
+
+
+<main class="public-container">
+
+    <section class="page-header">
+
+        <div>
+            <h1>Public Issues</h1>
+
+            <p>
+                View public issues reported by citizens
+                and support issues that matter to your community.
+            </p>
+        </div>
+
+    </section>
+
+
+    <section class="filter-section">
+
+        <input
+                type="text"
+                id="searchInput"
+                placeholder="Search issues..."
+        >
+
+        <select id="categoryFilter">
+
+            <option value="">All Categories</option>
+
+            <option value="Roads & Infrastructure">
+                Roads & Infrastructure
+            </option>
+
+            <option value="Streetlight">
+                Streetlight
+            </option>
+
+            <option value="Sanitation">
+                Sanitation
+            </option>
+
+            <option value="Water Supply">
+                Water Supply
+            </option>
+
+            <option value="Traffic">
+                Traffic
+            </option>
+
+            <option value="Parks & Environment">
+                Parks & Environment
+            </option>
+
+            <option value="Pothole">
+                Pothole
+            </option>
+
+            <option value="Other">
+                Other
+            </option>
+
+
+        </select>
+
+
+        <select id="statusFilter">
+
+            <option value="">All Status</option>
+
+            <option value="REPORTED">
+                Reported
+            </option>
+
+            <option value="VERIFIED">
+                Verified
+            </option>
+
+            <option value="ASSIGNED">
+                Assigned
+            </option>
+
+            <option value="IN_PROGRESS">
+                In Progress
+            </option>
+
+            <option value="RESOLVED">
+                Resolved
+            </option>
+
+            <option value="CLOSED">
+                Closed
+            </option>
+
+        </select>
+
+    </section>
+
+
+    <section id="issuesContainer" class="issues-grid">
+
+        <p class="loading">
+            Loading public issues...
+        </p>
+
+    </section>
+
+</main>
+
+
+<script src="/public-issues.js"></script>
+
+</body>
+</html>
